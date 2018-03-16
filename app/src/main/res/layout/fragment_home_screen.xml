@@ -1,0 +1,65 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.joshua.snowsquirrel.HomeFrag">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="16dp"
+        android:layout_marginLeft="16dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ff0000"
+            android:id="@+id/connected_layout">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/connected_text"
+                android:textColor="#ffffff"
+                android:text="Not Connected!"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:textSize="20sp"
+                android:text="Choose Path:"/>
+
+            <!-- TODO: Need to make a few sample paths and load them in-->
+            <Spinner
+                android:id="@+id/path_chooser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
+
+        <!-- TODO: Need to make a preview of the path...maybe with live tracking of where it is in the path -->
+
+        <Button
+            android:id="@+id/start_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:paddingBottom="16dp"
+            android:paddingTop="16dp"
+            android:text="Start Path"
+            android:textSize="24sp" />
+
+    </LinearLayout>
+
+
+</FrameLayout>

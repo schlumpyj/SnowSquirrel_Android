@@ -12,9 +12,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+
+// TODO: TCP connection code!
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private Fragment homeFrag, manualFrag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,15 +29,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -40,6 +38,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        homeFrag = new HomeFrag();
+        manualFrag = new ManualControl();
+
+        selectFrag(homeFrag);
     }
 
     @Override
@@ -85,13 +88,22 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_paths) {
 
         } else if (id == R.id.nav_manual_control) {
-
+            selectFrag(manualFrag);
         } else if (id == R.id.home) {
-
+            selectFrag(homeFrag);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void selectFrag(Fragment frag) {
+
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, frag);
+        fragmentTransaction.commit();
+
     }
 }
