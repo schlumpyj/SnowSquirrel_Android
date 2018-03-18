@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         android:layout_marginRight="16dp"
         android:layout_marginLeft="16dp"
+        android:id="@+id/home_layout"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -47,17 +48,25 @@
 
         </RelativeLayout>
 
-        <!-- TODO: Need to make a preview of the path...maybe with live tracking of where it is in the path -->
-
-        <Button
-            android:id="@+id/start_path"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_marginTop="30dp"
-            android:paddingBottom="16dp"
-            android:paddingTop="16dp"
-            android:text="Start Path"
-            android:textSize="24sp" />
+            android:id="@+id/canvas_test">
+
+            <Button
+                android:id="@+id/start_path"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="Start Path"
+                android:textSize="24sp" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
