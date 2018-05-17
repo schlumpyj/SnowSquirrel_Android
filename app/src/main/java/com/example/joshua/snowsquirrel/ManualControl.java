@@ -1,11 +1,15 @@
 package com.example.joshua.snowsquirrel;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
+import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 
 /**
@@ -22,6 +26,8 @@ public class ManualControl extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private JoystickView joystick;
 
 
     public ManualControl() {
@@ -59,7 +65,23 @@ public class ManualControl extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_manual_control, container, false);
+        View view = inflater.inflate(R.layout.fragment_manual_control, container, false);
+
+        Intent i = getActivity().getIntent();
+
+        joystick = (JoystickView)view.findViewById(R.id.joystick);
+
+
+        joystick.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                //show dialog here
+                //mTCP.printer();
+                return true;
+            }
+        });
+
+        return view;
     }
 
 }

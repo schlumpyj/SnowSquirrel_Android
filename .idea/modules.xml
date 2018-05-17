@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SnowSquirrel.iml" filepath="$PROJECT_DIR$/SnowSquirrel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SnowSquirrel_Android.iml" filepath="$PROJECT_DIR$/SnowSquirrel_Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/virtualjoystick/virtualjoystick.iml" filepath="$PROJECT_DIR$/virtualjoystick/virtualjoystick.iml" />
     </modules>
