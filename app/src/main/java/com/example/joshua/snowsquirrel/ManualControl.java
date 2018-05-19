@@ -2,12 +2,15 @@ package com.example.joshua.snowsquirrel;
 
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
@@ -27,8 +30,11 @@ public class ManualControl extends Fragment {
     private String mParam1;
     private String mParam2;
 
+
+    private Button enable_disable;
     private JoystickView joystick;
 
+    private boolean isEnabled = false;
 
     public ManualControl() {
         // Required empty public constructor
@@ -62,6 +68,13 @@ public class ManualControl extends Fragment {
     }
 
     @Override
+    public void onResume(){
+        super.onResume();
+
+        connectionState(((MainActivity)getActivity()).isConnected());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -71,17 +84,60 @@ public class ManualControl extends Fragment {
 
         joystick = (JoystickView)view.findViewById(R.id.joystick);
 
+        enable_disable = (Button)view.findViewById(R.id.enable_manual_control);
 
-        joystick.setOnTouchListener(new View.OnTouchListener() {
+        enable_disable.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //show dialog here
-                //mTCP.printer();
-                return true;
+            public void onClick(View v) {
+                isEnabled = !isEnabled;
+                if (isEnabled)
+                {
+                    ConstantUpdater stuff = new ConstantUpdater();
+                    (new Thread(stuff)).start();
+                    enable_disable.setText("Disable");
+                    enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorDisable));
+                }
+                else
+                {
+                    enable_disable.setText("Enable");
+                    enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorEnable));
+                }
+
             }
         });
 
         return view;
     }
 
+    class ConstantUpdater implements Runnable
+    {
+        public void run()
+        {
+            while (isEnabled)
+            {
+                ((MainActivity)getActivity()).sendData("1,"+joystick.getNormalizedX()+","+joystick.getNormalizedY());
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void connectionState(boolean state)
+    {
+        if (state)
+        {
+            enable_disable.setText("Enable");
+            enable_disable.setEnabled(true);
+            enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorEnable));
+        }
+        else
+        {
+            enable_disable.setText("Not connected");
+            enable_disable.setEnabled(false);
+            enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorDisable));
+        }
+    }
 }

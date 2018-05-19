@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity
     private String IP_ADDR = "10.0.0.83";
     private int PORT = 5500;
     private TcpClient mTcpClient;
-    ConnectTask connectBoi;
     //private Ros ros;
 
     @Override
@@ -70,10 +69,8 @@ public class MainActivity extends AppCompatActivity
         manualFrag = new ManualControl();
         settingsFrag = new Settings();
 
-
-        // connect to the server
-        connectBoi = new ConnectTask();
-        connectBoi.execute("");
+        ConnectTask yes = new ConnectTask();
+        (new Thread(yes)).start();
 
         selectFrag(homeFrag);
 
@@ -117,9 +114,6 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        Log.e("a", "I am working...");
-        new SendTask().execute("");
-
         if (id == R.id.nav_settings) {
             selectFrag(settingsFrag);
         } else if (id == R.id.nav_paths) {
@@ -148,29 +142,42 @@ public class MainActivity extends AppCompatActivity
         //you can leave it empty
     }
 
-    public class ConnectTask extends AsyncTask<String, String, TcpClient> {
-
-        @Override
-        protected TcpClient doInBackground(String... message) {
-
-            //we create a TCPClient object and
+    public class ConnectTask implements Runnable {
+        public void run()
+        {
             mTcpClient = new TcpClient(new TcpClient.OnMessageReceived() {
                 @Override
                 //here the messageReceived method is implemented
                 public void messageReceived(String message) {
                     //this method calls the onProgressUpdate
-                    publishProgress(message);
+                    Log.e("message", message);
                 }
             });
             mTcpClient.run();
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
         }
     }
+
+    public class SendMessage implements Runnable {
+        private String message;
+        public SendMessage(String message)
+        {
+            this.message = message;
+        }
+        public void run()
+        {
+            mTcpClient.sendMessage(message);
+        }
+    }
+
+    public void sendData(String data)
+    {
+        SendMessage stuff = new SendMessage(data);
+        (new Thread(stuff)).start();
+    }
+
+    public boolean isConnected(){
+        return mTcpClient.mRun;
+    }
+
 
 }
