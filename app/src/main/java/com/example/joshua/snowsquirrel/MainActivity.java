@@ -1,6 +1,7 @@
 package com.example.joshua.snowsquirrel;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -22,6 +23,8 @@ import android.view.MenuItem;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.esotericsoftware.kryonet.Client;
 
@@ -50,6 +53,10 @@ public class MainActivity extends AppCompatActivity
     private TcpClient mTcpClient;
     private boolean isConnected = false;
     private Toolbar toolbar;
+
+    private TextView connected_text;
+    private RelativeLayout connected_layout;
+
     //private Ros ros;
 
     @Override
@@ -67,6 +74,9 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        connected_text = (TextView)findViewById(R.id.connected_text);
+        connected_layout = (RelativeLayout)findViewById(R.id.connected_layout);
 
         homeFrag = new HomeFrag();
         manualFrag = new ManualControl();
@@ -183,31 +193,32 @@ public class MainActivity extends AppCompatActivity
             {
                 if (mTcpClient != null)
                 {
-                    boolean current = mTcpClient.isConnected();
-                    //Log.e("what", current ? "connected": "not connected");
-                    if (current != isConnected)
+                    // send heartbeat message
+                    sendData("heartbeat");
+
+                    // check to see how long it was since the last message
+                    if (System.currentTimeMillis() - mTcpClient.getLastUpdateTime() > 1000)
                     {
-                        isConnected = current;
                         if (isConnected)
                             runOnUiThread(new Runnable() {
-
                                 @Override
                                 public void run() {
-                                    toolbar.setBackgroundColor(0xea204c);
+                                    setConnectionGUIState(false);
                                 }
-
                             });
-                        else
-                        {
+                        isConnected = false;
+                    }
+
+                    else
+                    {
+                        if (!isConnected)
                             runOnUiThread(new Runnable() {
-
                                 @Override
                                 public void run() {
-                                    toolbar.setBackgroundColor(0x42f474);
+                                    setConnectionGUIState(true);
                                 }
-
                             });
-                        }
+                        isConnected = true;
                     }
                 }
 
@@ -228,6 +239,24 @@ public class MainActivity extends AppCompatActivity
 
     public boolean isConnected(){
         return isConnected;
+    }
+
+    private void setConnectionGUIState(boolean connected)
+    {
+        if (homeFrag.isVisible())
+        {
+            if (connected)
+            {
+                ((RelativeLayout)findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorEnable);
+                ((TextView)findViewById(R.id.connected_text)).setText("Connected!");
+            }
+            else
+            {
+                ((RelativeLayout)findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorAccent);
+                ((TextView)findViewById(R.id.connected_text)).setText("Not Connected!");
+            }
+        }
+
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.joshua.snowsquirrel;
 import android.util.Log;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class TcpClient{
@@ -21,7 +22,7 @@ public class TcpClient{
     private BufferedReader mBufferIn;
     private Socket socket;
 
-    private boolean isConnected = false;
+    private long lastUpdate;
 
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
@@ -69,12 +70,7 @@ public class TcpClient{
 
         try {
             //here you must put your computer's IP address.
-            InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-
-            Log.e("TCP Client", "C: Connecting...");
-
-            //create a socket to make the connection with the server
-            socket = new Socket(serverAddr, SERVER_PORT);
+            tryToConnect();
 
             try {
                 //sends the message to the server
@@ -87,9 +83,8 @@ public class TcpClient{
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
-                    Log.e("what", "going");
                     mServerMessage = mBufferIn.readLine();
-
+                    lastUpdate = System.currentTimeMillis();
                     if (mServerMessage != null && mMessageListener != null) {
                         //call the method messageReceived from MyActivity class
                         mMessageListener.messageReceived(mServerMessage);
@@ -106,6 +101,7 @@ public class TcpClient{
                 //the socket must be closed. It is not possible to reconnect to this socket
                 // after it is closed, which means a new socket instance has to be created.
                 socket.close();
+                run();
             }
 
         } catch (Exception e) {
@@ -115,19 +111,30 @@ public class TcpClient{
 
     }
 
+    private void tryToConnect()
+    {
+        Log.e("here", "here");
+        while (socket == null || !socket.isConnected() || socket.isClosed()) {
+            try {
+                Log.e("trying", "trying");
+                InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+                socket = new Socket();
+                InetSocketAddress sa = new InetSocketAddress(serverAddr, SERVER_PORT);
+                socket.connect(sa, 500);
+            } catch (IOException e) {
+            }
+        }
+    }
+
+
     //Declare the interface. The method messageReceived(String message) will must be implemented in the MyActivity
     //class at on asynckTask doInBackground
     public interface OnMessageReceived {
         public void messageReceived(String message);
     }
 
-    public boolean isConnected()
+    public long getLastUpdateTime()
     {
-        if (socket == null || mBufferIn == null)
-            return false;
-        else
-        {
-            return true;
-        }
+        return lastUpdate;
     }
 }
