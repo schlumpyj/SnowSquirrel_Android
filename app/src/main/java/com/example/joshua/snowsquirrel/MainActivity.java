@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity
 
     private String IP_ADDR = "10.0.0.83";
     private int PORT = 5500;
-    private Client client;
+    private TcpClient mTcpClient;
+    ConnectTask connectBoi;
     //private Ros ros;
 
     @Override
@@ -69,18 +70,10 @@ public class MainActivity extends AppCompatActivity
         manualFrag = new ManualControl();
         settingsFrag = new Settings();
 
-        Client client = new Client();
-        client.start();
-        try {
-            client.connect(5000, "10.24.67.20", 5000, 5001);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        SomeRequest request = new SomeRequest();
-        request.text = "Here is the request";
-        client.sendTCP(request);
-
+        // connect to the server
+        connectBoi = new ConnectTask();
+        connectBoi.execute("");
 
         selectFrag(homeFrag);
 
@@ -124,9 +117,8 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        SomeRequest request = new SomeRequest();
-        request.text = "Here is the request";
-        client.sendTCP(request);
+        Log.e("a", "I am working...");
+        new SendTask().execute("");
 
         if (id == R.id.nav_settings) {
             selectFrag(settingsFrag);
@@ -156,8 +148,29 @@ public class MainActivity extends AppCompatActivity
         //you can leave it empty
     }
 
-}
+    public class ConnectTask extends AsyncTask<String, String, TcpClient> {
 
-class SomeRequest {
-    public String text;
+        @Override
+        protected TcpClient doInBackground(String... message) {
+
+            //we create a TCPClient object and
+            mTcpClient = new TcpClient(new TcpClient.OnMessageReceived() {
+                @Override
+                //here the messageReceived method is implemented
+                public void messageReceived(String message) {
+                    //this method calls the onProgressUpdate
+                    publishProgress(message);
+                }
+            });
+            mTcpClient.run();
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+        }
+    }
+
 }
