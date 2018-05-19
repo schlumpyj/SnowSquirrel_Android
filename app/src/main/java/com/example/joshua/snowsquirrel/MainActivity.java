@@ -33,6 +33,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import edu.wpi.rail.jrosbridge.Ros;
+import edu.wpi.rail.jrosbridge.Topic;
+import edu.wpi.rail.jrosbridge.messages.Message;
+
 import static android.content.ContentValues.TAG;
 
 // TODO: TCP connection code!
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity
 
     private String IP_ADDR = "10.0.0.83";
     private int PORT = 5500;
+    private Ros ros;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +69,12 @@ public class MainActivity extends AppCompatActivity
         homeFrag = new HomeFrag();
         manualFrag = new ManualControl();
         settingsFrag = new Settings();
+
+        ros = new Ros("localhost"); // change to ip
+
+        Topic echo = new Topic(ros, "/echo", "std_msgs/String");
+        Message toSend = new Message("{\"data\": \"hello, world!\"}");
+        echo.publish(toSend);
 
         // TODO: temp until I figure out how to properly do TCP
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
