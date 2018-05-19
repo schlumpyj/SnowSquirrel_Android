@@ -5,20 +5,23 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class TcpClient {
+public class TcpClient{
 
-    public static final String SERVER_IP = "10.0.2.2"; //your computer IP address
+    public static final String SERVER_IP = "10.0.0.184"; //your computer IP address
     public static final int SERVER_PORT = 12346;
     // message to send to the server
     private String mServerMessage;
     // sends message received notifications
     private OnMessageReceived mMessageListener = null;
     // while this is true, the server will continue running
-    public boolean mRun = false;
+    private boolean mRun = false;
     // used to send messages
     private PrintWriter mBufferOut;
     // used to read messages from the server
     private BufferedReader mBufferIn;
+    private Socket socket;
+
+    private boolean isConnected = false;
 
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
@@ -71,10 +74,9 @@ public class TcpClient {
             Log.e("TCP Client", "C: Connecting...");
 
             //create a socket to make the connection with the server
-            Socket socket = new Socket(serverAddr, SERVER_PORT);
+            socket = new Socket(serverAddr, SERVER_PORT);
 
             try {
-
                 //sends the message to the server
                 mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
@@ -85,7 +87,7 @@ public class TcpClient {
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
-
+                    Log.e("what", "going");
                     mServerMessage = mBufferIn.readLine();
 
                     if (mServerMessage != null && mMessageListener != null) {
@@ -98,7 +100,6 @@ public class TcpClient {
                 Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
 
             } catch (Exception e) {
-
                 Log.e("TCP", "S: Error", e);
 
             } finally {
@@ -108,7 +109,6 @@ public class TcpClient {
             }
 
         } catch (Exception e) {
-
             Log.e("TCP", "C: Error", e);
 
         }
@@ -119,5 +119,15 @@ public class TcpClient {
     //class at on asynckTask doInBackground
     public interface OnMessageReceived {
         public void messageReceived(String message);
+    }
+
+    public boolean isConnected()
+    {
+        if (socket == null || mBufferIn == null)
+            return false;
+        else
+        {
+            return true;
+        }
     }
 }

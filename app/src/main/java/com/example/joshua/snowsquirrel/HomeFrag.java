@@ -73,14 +73,7 @@ public class HomeFrag extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_screen, container, false);
 
-
-
-
-
         final RelativeLayout test = (RelativeLayout)view.findViewById(R.id.canvas_test);
-
-
-
 
         List<String> spinnerArray =  new ArrayList<String>();
         spinnerArray.add("Triple I");

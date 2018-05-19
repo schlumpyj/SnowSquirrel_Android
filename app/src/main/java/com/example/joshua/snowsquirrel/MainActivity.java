@@ -1,6 +1,7 @@
 package com.example.joshua.snowsquirrel;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,13 +48,15 @@ public class MainActivity extends AppCompatActivity
     private String IP_ADDR = "10.0.0.83";
     private int PORT = 5500;
     private TcpClient mTcpClient;
+    private boolean isConnected = false;
+    private Toolbar toolbar;
     //private Ros ros;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -71,6 +74,9 @@ public class MainActivity extends AppCompatActivity
 
         ConnectTask yes = new ConnectTask();
         (new Thread(yes)).start();
+
+        ConnectionTester no = new ConnectionTester();
+        (new Thread(no)).start();
 
         selectFrag(homeFrag);
 
@@ -169,6 +175,51 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public class ConnectionTester implements Runnable {
+
+        public void run()
+        {
+            while (true)
+            {
+                if (mTcpClient != null)
+                {
+                    boolean current = mTcpClient.isConnected();
+                    //Log.e("what", current ? "connected": "not connected");
+                    if (current != isConnected)
+                    {
+                        isConnected = current;
+                        if (isConnected)
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    toolbar.setBackgroundColor(0xea204c);
+                                }
+
+                            });
+                        else
+                        {
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    toolbar.setBackgroundColor(0x42f474);
+                                }
+
+                            });
+                        }
+                    }
+                }
+
+                try {
+                    Thread.sleep(400);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     public void sendData(String data)
     {
         SendMessage stuff = new SendMessage(data);
@@ -176,8 +227,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public boolean isConnected(){
-        return mTcpClient.mRun;
+        return isConnected;
     }
-
 
 }
