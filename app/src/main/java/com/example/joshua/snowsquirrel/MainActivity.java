@@ -22,6 +22,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 
+import com.esotericsoftware.kryonet.Client;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -32,10 +34,6 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-import edu.wpi.rail.jrosbridge.Ros;
-import edu.wpi.rail.jrosbridge.Topic;
-import edu.wpi.rail.jrosbridge.messages.Message;
 
 import static android.content.ContentValues.TAG;
 
@@ -48,7 +46,8 @@ public class MainActivity extends AppCompatActivity
 
     private String IP_ADDR = "10.0.0.83";
     private int PORT = 5500;
-    private Ros ros;
+    private Client client;
+    //private Ros ros;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,16 +69,18 @@ public class MainActivity extends AppCompatActivity
         manualFrag = new ManualControl();
         settingsFrag = new Settings();
 
-        ros = new Ros("localhost"); // change to ip
+        Client client = new Client();
+        client.start();
+        try {
+            client.connect(5000, "10.24.67.20", 5000, 5001);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        Topic echo = new Topic(ros, "/echo", "std_msgs/String");
-        Message toSend = new Message("{\"data\": \"hello, world!\"}");
-        echo.publish(toSend);
+        SomeRequest request = new SomeRequest();
+        request.text = "Here is the request";
+        client.sendTCP(request);
 
-        // TODO: temp until I figure out how to properly do TCP
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
-        StrictMode.setThreadPolicy(policy);
 
         selectFrag(homeFrag);
 
@@ -123,9 +124,12 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        SomeRequest request = new SomeRequest();
+        request.text = "Here is the request";
+        client.sendTCP(request);
+
         if (id == R.id.nav_settings) {
             selectFrag(settingsFrag);
-            runTcpClient();
         } else if (id == R.id.nav_paths) {
 
         } else if (id == R.id.nav_manual_control) {
@@ -152,29 +156,8 @@ public class MainActivity extends AppCompatActivity
         //you can leave it empty
     }
 
+}
 
-
-    // doesn't work
-    private void runTcpClient() {
-        try {
-            Socket s = new Socket(IP_ADDR, PORT);
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-            //send output msg
-            String outMsg = "TCP connecting to " + PORT + System.getProperty("line.separator");
-            out.write(outMsg);
-            out.flush();
-            Log.i("TcpClient", "sent: " + outMsg);
-            //accept server response
-            String inMsg = in.readLine() + System.getProperty("line.separator");
-            Log.i("TcpClient", "received: " + inMsg);
-            //close connection
-            s.close();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+class SomeRequest {
+    public String text;
 }
