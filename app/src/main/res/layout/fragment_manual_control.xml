@@ -1,12 +1,12 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:stream="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.joshua.snowsquirrel.ManualControl">
 
     <!-- TODO: Update blank fragment layout -->
-    <LinearLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,32 +15,40 @@
         tools:context="com.example.joshua.snowsquirrel.MainActivity"
         tools:showIn="@layout/app_bar_main">
 
-        <io.github.controlwear.virtual.joystick.android.JoystickView
-            xmlns:custom="http://schemas.android.com/apk/res-auto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <yjkim.mjpegviewer.MjpegView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_alignParentTop="true"
+            android:id="@+id/videwView" />
+
+        <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"
             android:id="@+id/joystick"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            custom:JV_backgroundColor="#5BC0EB"
+            custom:JV_borderColor="#5863F8"
+            custom:JV_borderWidth="4dp"
             custom:JV_buttonColor="#EFE9F4"
             custom:JV_buttonSizeRatio="15%"
-            custom:JV_borderColor="#5863F8"
-            custom:JV_backgroundColor="#5BC0EB"
-            custom:JV_borderWidth="4dp"
             custom:JV_fixedCenter="false"
-            tools:layout_editor_absoluteY="0dp"
-            tools:layout_editor_absoluteX="0dp" />
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp" />
 
         <Button
             android:id="@+id/enable_manual_control"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
+            android:layout_alignParentBottom="true"
             android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
             android:paddingBottom="16dp"
             android:paddingTop="16dp"
             android:text="Enable"
             android:textSize="24sp" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </FrameLayout>

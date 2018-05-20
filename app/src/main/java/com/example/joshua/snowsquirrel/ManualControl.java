@@ -11,8 +11,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import io.github.controlwear.virtual.joystick.android.JoystickView;
+import yjkim.mjpegviewer.MjpegView;
 
 
 /**
@@ -106,7 +108,16 @@ public class ManualControl extends Fragment {
             }
         });
 
+        MjpegView mv = (MjpegView) view.findViewById(R.id.videwView);
+
+        mv.Start("http://webcam.st-malo.com/axis-cgi/mjpg/video.cgi?resolution=352x288");
+
         return view;
+    }
+
+    public boolean getEnabled()
+    {
+        return isEnabled;
     }
 
     class ConstantUpdater implements Runnable
@@ -115,6 +126,11 @@ public class ManualControl extends Fragment {
         {
             while (isEnabled)
             {
+                if (((MainActivity)getActivity())== null)
+                {
+                    isEnabled = false;
+                    break;
+                }
                 ((MainActivity)getActivity()).sendData("1,"+joystick.getNormalizedX()+","+joystick.getNormalizedY());
                 try {
                     Thread.sleep(100);
@@ -138,6 +154,21 @@ public class ManualControl extends Fragment {
             enable_disable.setText("Not connected");
             enable_disable.setEnabled(false);
             enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorDisable));
+        }
+    }
+
+    public void setConnectionState(boolean state)
+    {
+        if (state)
+            connectionState(true);
+        else
+        {
+            if (isEnabled)
+            {
+                Toast.makeText(getContext(), "Lost connection with robot!", Toast.LENGTH_LONG).show();
+                connectionState(false);
+                isEnabled = false;
+            }
         }
     }
 }

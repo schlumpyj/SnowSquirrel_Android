@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -34,4 +38,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile group: 'kryonet', name:'kryonet', version:'2.21'
+    compile 'com.github.dydwo92:Android-Simple-MjpegViewer:0.0'
 }

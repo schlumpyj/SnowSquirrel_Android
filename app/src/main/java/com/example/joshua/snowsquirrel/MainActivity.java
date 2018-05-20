@@ -25,6 +25,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.esotericsoftware.kryonet.Client;
 
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity
 
     private TextView connected_text;
     private RelativeLayout connected_layout;
+
+    private ManualControl fragment;
 
     //private Ros ros;
 
@@ -130,6 +133,9 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        if (((ManualControl)manualFrag).getEnabled() && id != R.id.nav_manual_control)
+            Toast.makeText(this, "Manual Control Disabled", Toast.LENGTH_LONG).show();
+
         if (id == R.id.nav_settings) {
             selectFrag(settingsFrag);
         } else if (id == R.id.nav_paths) {
@@ -200,12 +206,15 @@ public class MainActivity extends AppCompatActivity
                     if (System.currentTimeMillis() - mTcpClient.getLastUpdateTime() > 1000)
                     {
                         if (isConnected)
+                        {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     setConnectionGUIState(false);
+                                    ((ManualControl)manualFrag).setConnectionState(false);
                                 }
                             });
+                        }
                         isConnected = false;
                     }
 
@@ -215,7 +224,9 @@ public class MainActivity extends AppCompatActivity
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    Log.e("what", "im here boi");
                                     setConnectionGUIState(true);
+                                    ((ManualControl)manualFrag).setConnectionState(true);
                                 }
                             });
                         isConnected = true;
