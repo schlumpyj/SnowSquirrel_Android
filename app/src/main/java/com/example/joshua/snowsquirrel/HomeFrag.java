@@ -16,6 +16,10 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +39,7 @@ public class HomeFrag extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private MyView canvas;
+    private GraphView graph;
 
     private View view;
 
@@ -84,7 +88,7 @@ public class HomeFrag extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_home_screen, container, false);
 
-        final RelativeLayout test = (RelativeLayout)view.findViewById(R.id.canvas_test);
+        graph = (GraphView)view.findViewById(R.id.graph);
 
         List<String> spinnerArray =  new ArrayList<String>();
         spinnerArray.add("Triple I");
@@ -101,36 +105,15 @@ public class HomeFrag extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 // your code here
-                ArrayList<Integer[]> yes = new ArrayList<>();
-;
-                if (position==1){
-                    test.removeView(canvas);
-                    yes.clear();
-                    yes.add(new Integer[]{ 0, 100});
-                    yes.add(new Integer[]{ 30, 100});
-                    yes.add(new Integer[]{ 30, 0});
-                    yes.add(new Integer[]{ 10, 0});
-
-                    canvas = new MyView(getContext(), yes, test);
-
-                    test.addView(canvas);
-                }
-                else{
-                    test.removeView(canvas);
-
-                    yes.clear();
-
-                    for (int i = 0; i<100; i+=20){
-                        yes.add(new Integer[]{ i, 0});
-                        yes.add(new Integer[]{ i, 100});
-                        yes.add(new Integer[]{ i+10, 100});
-                        yes.add(new Integer[]{ i+10, 0});
-                    }
-
-                    canvas = new MyView(getContext(), yes, test);
-
-                    test.addView(canvas);
-                }
+                LineGraphSeries<DataPoint> series2 = new LineGraphSeries<>(new DataPoint[] {
+                        new DataPoint(0, 3),
+                        new DataPoint(1, 3),
+                        new DataPoint(2, 6),
+                        new DataPoint(3, 2),
+                        new DataPoint(4, 5),
+                        new DataPoint(10, 10)
+                });
+                graph.addSeries(series2);
             }
 
             @Override
@@ -154,66 +137,6 @@ public class HomeFrag extends Fragment {
         {
             ((RelativeLayout)view.findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorAccent);
             ((TextView)view.findViewById(R.id.connected_text)).setText("Not Connected!");
-        }
-    }
-
-    public class MyView extends View {
-        ArrayList<Integer[]> points;
-        Integer[] start;
-        int x, y;
-
-        public MyView(Context context, ArrayList<Integer[]> points, RelativeLayout relativeLayout) {
-            super(context);
-            // TODO Auto-generated constructor stub
-            this.points = points;
-            start = new Integer[]{ 0, 0 };
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            // TODO Auto-generated method stub
-            super.onDraw(canvas);
-            int x = getWidth();
-            int y = getHeight() - 300;
-
-            Paint p1 = new Paint();
-            p1.setAntiAlias(true);
-            p1.setColor(Color.BLACK);
-            p1.setStrokeWidth(20);
-
-            Integer[] result = findMax();
-            float other, multiX, multiY;
-            if (result[0]>result[1]){
-                other = result[0]/result[1];
-                multiX = x/result[0];
-                multiY = (y/result[1])*other;
-            }
-            else{
-                other = result[1]/result[0];
-                multiX = x/result[0]*(1/other);
-                multiY = (y/result[1]);
-            }
-
-
-
-            for (Integer[] pointPair: points){
-                canvas.drawLine(start[0]*multiX, start[1]*multiY, pointPair[0]*multiX, pointPair[1]*multiY, p1);
-                start = pointPair;
-            }
-        }
-
-        private Integer[] findMax(){
-            int largeX = 0;
-            int largeY = 0;
-
-            for (Integer[] pointPair: points) {
-                if (pointPair[0]>largeX)
-                    largeX = pointPair[0];
-                if (pointPair[1]>largeY)
-                    largeY = pointPair[1];
-            }
-            return new Integer[]{ largeX, largeY };
-
         }
     }
 

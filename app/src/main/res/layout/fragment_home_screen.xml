@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.joshua.snowsquirrel.HomeFrag">
 
     <LinearLayout
@@ -49,12 +50,18 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_marginTop="30dp"
             android:layout_marginRight="16dp"
             android:layout_marginLeft="16dp"
             android:id="@+id/canvas_test">
+
+            <com.jjoe64.graphview.GraphView
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:id="@+id/graph"
+                app:seriesColor="#ee0000" />
 
             <Button
                 android:id="@+id/start_path"

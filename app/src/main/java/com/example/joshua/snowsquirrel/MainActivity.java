@@ -47,7 +47,7 @@ import static android.content.ContentValues.TAG;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Settings.OnFragmentInteractionListener {
 
-    private Fragment homeFrag, manualFrag, settingsFrag;
+    private Fragment homeFrag, manualFrag, pathSetter, settingsFrag;
 
     private String IP_ADDR = "10.0.0.83";
     private int PORT = 5500;
@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity
         homeFrag = new HomeFrag();
         manualFrag = new ManualControl();
         settingsFrag = new Settings();
+        pathSetter = new PathSetter();
 
         ConnectTask yes = new ConnectTask();
         (new Thread(yes)).start();
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity
         (new Thread(no)).start();
 
         selectFrag(homeFrag);
+        navigationView.getMenu().getItem(0).setChecked(true);
 
     }
 
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_settings) {
             selectFrag(settingsFrag);
         } else if (id == R.id.nav_paths) {
-
+            selectFrag(pathSetter);
         } else if (id == R.id.nav_manual_control) {
             selectFrag(manualFrag);
         } else if (id == R.id.home) {
