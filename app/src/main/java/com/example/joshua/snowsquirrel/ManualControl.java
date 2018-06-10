@@ -145,12 +145,22 @@ public class ManualControl extends Fragment {
     {
         if (state)
         {
+            if (enable_disable == null)
+            {
+                ((MainActivity)getActivity()).setConnected(false);
+                return;
+            }
             enable_disable.setText("Enable");
             enable_disable.setEnabled(true);
             enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorEnable));
         }
         else
         {
+            if (enable_disable == null)
+            {
+                ((MainActivity)getActivity()).setConnected(true);
+                return;
+            }
             enable_disable.setText("Not connected");
             enable_disable.setEnabled(false);
             enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorDisable));

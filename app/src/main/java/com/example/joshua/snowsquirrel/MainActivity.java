@@ -222,6 +222,7 @@ public class MainActivity extends AppCompatActivity
 
                     else
                     {
+                        Log.d("Connected", isConnected?"Yes":"No");
                         if (!isConnected)
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -270,6 +271,11 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+    }
+
+    public void setConnected(boolean state)
+    {
+        isConnected = state;
     }
 
 }
