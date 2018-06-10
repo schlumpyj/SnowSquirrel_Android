@@ -32,6 +32,7 @@
                 android:layout_height="50dp"
                 android:layout_weight=".33"
                 android:id="@+id/x_coord"
+                android:inputType = "number"
                 android:hint="X"/>
 
             <EditText
@@ -39,6 +40,7 @@
                 android:layout_height="50dp"
                 android:layout_weight=".33"
                 android:id="@+id/y_coord"
+                android:inputType = "number"
                 android:hint="Y"/>
 
             <Button

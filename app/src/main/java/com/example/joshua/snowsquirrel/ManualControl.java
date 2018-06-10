@@ -131,7 +131,8 @@ public class ManualControl extends Fragment {
                     isEnabled = false;
                     break;
                 }
-                ((MainActivity)getActivity()).sendData("1,"+joystick.getNormalizedX()+","+joystick.getNormalizedY());
+                ((MainActivity)getActivity()).sendData("1,"+standardizeJoystickValue(joystick.getNormalizedX())
+                        +","+(-1*standardizeJoystickValue(joystick.getNormalizedY())));
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -141,13 +142,20 @@ public class ManualControl extends Fragment {
         }
     }
 
+    private double standardizeJoystickValue(int value)
+    {
+        value = value - 50;
+        return value/44.0;
+    }
+
     private void connectionState(boolean state)
     {
         if (state)
         {
             if (enable_disable == null)
             {
-                ((MainActivity)getActivity()).setConnected(false);
+                if (getActivity() != null)
+                    ((MainActivity)getActivity()).setConnected(false);
                 return;
             }
             enable_disable.setText("Enable");
@@ -158,7 +166,8 @@ public class ManualControl extends Fragment {
         {
             if (enable_disable == null)
             {
-                ((MainActivity)getActivity()).setConnected(true);
+                if (getActivity() != null)
+                    ((MainActivity)getActivity()).setConnected(true);
                 return;
             }
             enable_disable.setText("Not connected");
