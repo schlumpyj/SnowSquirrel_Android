@@ -131,7 +131,7 @@ public class ManualControl extends Fragment {
                     isEnabled = false;
                     break;
                 }
-                ((MainActivity)getActivity()).sendData("1,"+standardizeJoystickValue(joystick.getNormalizedX())
+                ((MainActivity)getActivity()).sendData("1,"+(-1*standardizeJoystickValue(joystick.getNormalizedX()))
                         +","+(-1*standardizeJoystickValue(joystick.getNormalizedY())));
                 try {
                     Thread.sleep(100);
@@ -155,7 +155,7 @@ public class ManualControl extends Fragment {
             if (enable_disable == null)
             {
                 if (getActivity() != null)
-                    ((MainActivity)getActivity()).setConnected(false);
+                    ((MainActivity)getActivity()).setConnected(true);
                 return;
             }
             enable_disable.setText("Enable");
@@ -167,7 +167,7 @@ public class ManualControl extends Fragment {
             if (enable_disable == null)
             {
                 if (getActivity() != null)
-                    ((MainActivity)getActivity()).setConnected(true);
+                    ((MainActivity)getActivity()).setConnected(false);
                 return;
             }
             enable_disable.setText("Not connected");
@@ -182,12 +182,9 @@ public class ManualControl extends Fragment {
             connectionState(true);
         else
         {
-            if (isEnabled)
-            {
-                Toast.makeText(getContext(), "Lost connection with robot!", Toast.LENGTH_LONG).show();
-                connectionState(false);
-                isEnabled = false;
-            }
+            Toast.makeText(getContext(), "Lost connection with robot!", Toast.LENGTH_LONG).show();
+            connectionState(false);
+            isEnabled = false;
         }
     }
 }

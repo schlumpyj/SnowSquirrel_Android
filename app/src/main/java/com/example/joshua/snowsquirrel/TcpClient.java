@@ -8,8 +8,9 @@ import java.net.Socket;
 
 public class TcpClient{
 
-    public static final String SERVER_IP = "10.0.0.126"; //your computer IP address
-    public static final int SERVER_PORT = 5002;
+    private String server_ip;
+    private int server_port;
+
     // message to send to the server
     private String mServerMessage;
     // sends message received notifications
@@ -47,9 +48,6 @@ public class TcpClient{
      * Close the connection and release the members
      */
     public void stopClient() {
-
-        // send message that we are closing the connection
-        sendMessage(Constants.CLOSED_CONNECTION+"Mono");
 
         mRun = false;
 
@@ -92,7 +90,7 @@ public class TcpClient{
 
                 }
 
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
+                Log.i("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
 
             } catch (Exception e) {
                 Log.e("TCP", "S: Error", e);
@@ -116,12 +114,15 @@ public class TcpClient{
         Log.e("here", "here");
         while (socket == null || !socket.isConnected() || socket.isClosed()) {
             try {
-                Log.e("trying", "trying");
-                InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+                //Log.e("trying", "trying");
+                InetAddress serverAddr = InetAddress.getByName(server_ip);
+                //Log.i("SERVER CONNECTION ADDR:", serverAddr.getHostAddress());
+                Log.i("SERVER ADDR", server_ip);
                 socket = new Socket();
-                InetSocketAddress sa = new InetSocketAddress(serverAddr, SERVER_PORT);
+                InetSocketAddress sa = new InetSocketAddress(serverAddr, server_port);
                 socket.connect(sa, 500);
             } catch (IOException e) {
+                //Log.i("fail", "failing");
             }
         }
     }
@@ -136,5 +137,11 @@ public class TcpClient{
     public long getLastUpdateTime()
     {
         return lastUpdate;
+    }
+
+    public void setIPandPORT(String ip, int port)
+    {
+        server_ip = ip;
+        server_port = port;
     }
 }

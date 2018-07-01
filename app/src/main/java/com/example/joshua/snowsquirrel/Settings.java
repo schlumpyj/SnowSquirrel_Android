@@ -1,6 +1,7 @@
 package com.example.joshua.snowsquirrel;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -8,6 +9,7 @@ import android.support.design.widget.TextInputEditText;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 
 /**
@@ -28,7 +30,9 @@ public class Settings extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private TextInputEditText ip_address;
+    private TextInputEditText ip_address, port, password;
+
+    private Button saveButton;
 
     private OnFragmentInteractionListener mListener;
 
@@ -69,6 +73,24 @@ public class Settings extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
         ip_address = (TextInputEditText)view.findViewById(R.id.robot_ip_address);
+        port = (TextInputEditText)view.findViewById(R.id.robot_tcp_port);
+        password = (TextInputEditText)view.findViewById(R.id.robot_password);
+
+        SharedPreferences preferences = this.getActivity().getSharedPreferences(((MainActivity)getActivity()).SETTINGS_LOCATION, Context.MODE_PRIVATE);
+
+        ip_address.setText(preferences.getString("robot_ip", ""));
+        port.setText(preferences.getString("robot_tcp_port", ""));
+        password.setText(preferences.getString("robot_password", ""));
+
+        saveButton = (Button)view.findViewById(R.id.save_settings);
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity)getActivity()).saveSettings();
+            }
+        });
+
         return view;
     }
 

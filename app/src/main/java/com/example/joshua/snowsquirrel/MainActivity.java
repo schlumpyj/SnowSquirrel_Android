@@ -1,6 +1,7 @@
 package com.example.joshua.snowsquirrel;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import android.os.Parcelable;
 import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputEditText;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -28,21 +30,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.esotericsoftware.kryonet.Client;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
-import static android.content.ContentValues.TAG;
-
 // TODO: TCP connection code!
 
 public class MainActivity extends AppCompatActivity
@@ -50,8 +37,8 @@ public class MainActivity extends AppCompatActivity
 
     private Fragment homeFrag, manualFrag, pathSetter, settingsFrag;
 
-    private String IP_ADDR = "10.0.0.83";
-    private int PORT = 5500;
+    public String SETTINGS_LOCATION = "robot_settings";
+
     private TcpClient mTcpClient;
     private boolean isConnected = false;
     private Toolbar toolbar;
@@ -61,7 +48,7 @@ public class MainActivity extends AppCompatActivity
 
     private ManualControl fragment;
 
-    //private Ros ros;
+    private String ip, port;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,11 +76,14 @@ public class MainActivity extends AppCompatActivity
         settingsFrag = new Settings();
         pathSetter = new PathSetter();
 
-        ConnectTask yes = new ConnectTask();
-        (new Thread(yes)).start();
+        ip = "10.24.67.20";
+        port = "5002";
 
-        ConnectionTester no = new ConnectionTester();
-        (new Thread(no)).start();
+        ConnectTask connectTask = new ConnectTask();
+        (new Thread(connectTask)).start();
+
+        ConnectionTester connectionTester = new ConnectionTester();
+        (new Thread(connectionTester)).start();
 
         selectFrag(homeFrag);
         navigationView.getMenu().getItem(0).setChecked(true);
@@ -132,7 +122,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -180,6 +169,8 @@ public class MainActivity extends AppCompatActivity
                     Log.e("message", message);
                 }
             });
+            mTcpClient.setIPandPORT(ip, Integer.valueOf(port));
+
             mTcpClient.run();
         }
     }
@@ -250,8 +241,8 @@ public class MainActivity extends AppCompatActivity
 
     public void sendData(String data)
     {
-        SendMessage stuff = new SendMessage(data);
-        (new Thread(stuff)).start();
+        SendMessage sender = new SendMessage(data);
+        (new Thread(sender)).start();
     }
 
     public boolean isConnected(){
@@ -279,6 +270,36 @@ public class MainActivity extends AppCompatActivity
     public void setConnected(boolean state)
     {
         isConnected = state;
+    }
+
+    public void saveSettings()
+    {
+        SharedPreferences preferences = getSharedPreferences(SETTINGS_LOCATION, MODE_PRIVATE);
+        SharedPreferences.Editor edit= preferences.edit();
+
+        ip = ((TextInputEditText)findViewById(R.id.robot_ip_address)).getText().toString();
+        port = ((TextInputEditText)findViewById(R.id.robot_tcp_port)).getText().toString();
+
+        edit.putString("robot_ip" , ip);
+        edit.putString("robot_tcp_port" , port);
+        edit.putString("robot_password" , ((TextInputEditText)findViewById(R.id.robot_password)).getText().toString());
+
+        edit.apply();
+
+        ChangeIPTask changer = new ChangeIPTask();
+        (new Thread(changer)).start();
+
+    }
+
+    public class ChangeIPTask implements Runnable {
+        public void run()
+        {
+            mTcpClient.stopClient();
+
+            mTcpClient.run();
+
+            mTcpClient.setIPandPORT(ip, Integer.valueOf(port));
+        }
     }
 
 }
