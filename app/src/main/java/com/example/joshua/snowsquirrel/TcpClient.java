@@ -100,7 +100,8 @@ public class TcpClient{
                 //the socket must be closed. It is not possible to reconnect to this socket
                 // after it is closed, which means a new socket instance has to be created.
                 socket.close();
-                run();
+                if (mRun)
+                    run();
             }
 
         } catch (Exception e) {
@@ -113,7 +114,7 @@ public class TcpClient{
     private void tryToConnect()
     {
         Log.e("here", "here");
-        while (socket == null || !socket.isConnected() || socket.isClosed()) {
+        while ((socket == null || !socket.isConnected() || socket.isClosed()) && mRun) {
             try {
                 //Log.e("trying", "trying");
                 InetAddress serverAddr = InetAddress.getByName(server_ip);

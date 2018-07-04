@@ -1,5 +1,7 @@
 package com.example.joshua.snowsquirrel;
 
+import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -82,8 +84,9 @@ public class MainActivity extends AppCompatActivity
         settingsFrag = new Settings();
         pathSetter = new PathSetter();
 
-        ip = "10.0.0.126";
-        port = "5002";
+        SharedPreferences preferences = getSharedPreferences(SETTINGS_LOCATION, Context.MODE_PRIVATE);
+        ip = preferences.getString("robot_ip", "10.24.67.20");
+        port = preferences.getString("robot_tcp_port", "5002");
 
         ConnectTask connectTask = new ConnectTask();
         (new Thread(connectTask)).start();
@@ -296,12 +299,8 @@ public class MainActivity extends AppCompatActivity
         {
             mTcpClient.stopClient();
 
-            Log.e("ip--------------", ip);
-
-            mTcpClient.setIPandPORT(ip, Integer.valueOf(port));
-
-            mTcpClient.run();
-
+            ConnectTask connectTask = new ConnectTask();
+            (new Thread(connectTask)).start();
 
         }
     }
