@@ -8,11 +8,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.PointsGraphSeries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +47,11 @@ public class HomeFrag extends Fragment {
 
     private View view;
 
+    private Button startPath;
+
     private ConnectionProcessor connectionProcessor;
+
+    private LineGraphSeries<DataPoint> series;
 
     public HomeFrag() {
         // Required empty public constructor
@@ -93,6 +100,11 @@ public class HomeFrag extends Fragment {
 
         graph = (GraphView)view.findViewById(R.id.graph);
 
+        startPath = (Button)view.findViewById(R.id.start_path);
+        startPath.setText("START PATH");
+        startPath.setEnabled(true);
+        startPath.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorEnable));
+
         Intent i = getActivity().getIntent();
 
         connectionProcessor = (ConnectionProcessor)i.getSerializableExtra("Connection");
@@ -102,7 +114,7 @@ public class HomeFrag extends Fragment {
         spinnerArray.add("Single I");
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this.getContext(), android.R.layout.simple_spinner_item, spinnerArray);
+                this.getContext(), R.layout.spinner, spinnerArray);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner sItems = (Spinner) view.findViewById(R.id.path_chooser);
@@ -112,15 +124,37 @@ public class HomeFrag extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 // your code here
-                LineGraphSeries<DataPoint> series2 = new LineGraphSeries<>(new DataPoint[] {
-                        new DataPoint(0, 3),
-                        new DataPoint(1, 3),
-                        new DataPoint(2, 6),
-                        new DataPoint(3, 2),
-                        new DataPoint(4, 5),
-                        new DataPoint(10, 10)
-                });
-                graph.addSeries(series2);
+                graph.removeAllSeries();
+                if (position == 1) {
+                    series = new LineGraphSeries<>(new DataPoint[] {
+                            new DataPoint(0, 0),
+                            new DataPoint(0, 10),
+                            new DataPoint(3, 10),
+                            new DataPoint(3, 0),
+                            new DataPoint(3.1,0)
+                    });
+                }
+                else {
+                    series = new LineGraphSeries<>(new DataPoint[] {
+                            new DataPoint(0, 0),
+                            new DataPoint(0, 10),
+                            new DataPoint(10, 10),
+                            new DataPoint(10, 0),
+                            new DataPoint(11,0)
+                    });
+                }
+
+                series.setDrawBackground(true);
+
+                graph.getViewport().setXAxisBoundsManual(true);
+                graph.getViewport().setMinX(0);
+                graph.getViewport().setMaxX(10);
+
+                graph.getViewport().setYAxisBoundsManual(true);
+                graph.getViewport().setMinY(0);
+                graph.getViewport().setMaxY(10);
+
+                graph.addSeries(series);
             }
 
             @Override
