@@ -244,10 +244,6 @@ public class MainActivity extends AppCompatActivity
         (new Thread(sender)).start();
     }
 
-    public boolean isConnected(){
-        return isConnected;
-    }
-
     private void setConnectionGUIState()
     {
         if (homeFrag.isVisible())
@@ -300,9 +296,13 @@ public class MainActivity extends AppCompatActivity
         {
             mTcpClient.stopClient();
 
-            mTcpClient.run();
+            Log.e("ip--------------", ip);
 
             mTcpClient.setIPandPORT(ip, Integer.valueOf(port));
+
+            mTcpClient.run();
+
+
         }
     }
 

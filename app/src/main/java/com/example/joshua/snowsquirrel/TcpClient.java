@@ -86,6 +86,7 @@ public class TcpClient{
                     if (mServerMessage != null && mMessageListener != null) {
                         //call the method messageReceived from MyActivity class
                         mMessageListener.messageReceived(mServerMessage);
+                        Log.i("received", mServerMessage);
                     }
 
                 }

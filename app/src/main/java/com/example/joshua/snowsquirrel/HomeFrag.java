@@ -2,6 +2,7 @@ package com.example.joshua.snowsquirrel;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -43,6 +44,8 @@ public class HomeFrag extends Fragment {
 
     private View view;
 
+    private ConnectionProcessor connectionProcessor;
+
     public HomeFrag() {
         // Required empty public constructor
     }
@@ -79,7 +82,7 @@ public class HomeFrag extends Fragment {
 
         super.onResume();
 
-        setConnectionGUIState(((MainActivity)getActivity()).isConnected());
+        setConnectionGUIState(connectionProcessor.getConnectionState());
     }
 
     @Override
@@ -89,6 +92,10 @@ public class HomeFrag extends Fragment {
         view = inflater.inflate(R.layout.fragment_home_screen, container, false);
 
         graph = (GraphView)view.findViewById(R.id.graph);
+
+        Intent i = getActivity().getIntent();
+
+        connectionProcessor = (ConnectionProcessor)i.getSerializableExtra("Connection");
 
         List<String> spinnerArray =  new ArrayList<String>();
         spinnerArray.add("Triple I");

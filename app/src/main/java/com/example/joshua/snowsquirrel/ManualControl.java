@@ -76,7 +76,7 @@ public class ManualControl extends Fragment {
     public void onResume(){
         super.onResume();
 
-        connectionState(((MainActivity)getActivity()).isConnected());
+        connectionState(connectionProcessor.getConnectionState());
     }
 
     @Override
@@ -118,22 +118,26 @@ public class ManualControl extends Fragment {
             new ConnectionListener() {
                 @Override
                 public void onConnected() {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setConnectionState(true);
-                        }
-                    });
+                    if (isVisible()) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setConnectionState(true);
+                            }
+                        });
+                    }
                 }
 
                 @Override
                 public void onDisconnected() {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setConnectionState(false);
-                        }
-                    });
+                    if (isVisible()) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setConnectionState(true);
+                            }
+                        });
+                    }
                 }
             }
         );
