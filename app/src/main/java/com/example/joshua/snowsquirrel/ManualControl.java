@@ -40,6 +40,7 @@ public class ManualControl extends Fragment {
     private boolean isEnabled = false;
 
     private ConnectionProcessor connectionProcessor;
+    private CommClass commClass;
 
     public ManualControl() {
         // Required empty public constructor
@@ -86,6 +87,8 @@ public class ManualControl extends Fragment {
         View view = inflater.inflate(R.layout.fragment_manual_control, container, false);
 
         Intent i = getActivity().getIntent();
+
+        commClass = new CommClass();
 
         connectionProcessor = (ConnectionProcessor)i.getSerializableExtra("Connection");
 
@@ -134,7 +137,7 @@ public class ManualControl extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                setConnectionState(true);
+                                setConnectionState(false);
                             }
                         });
                     }
@@ -163,8 +166,12 @@ public class ManualControl extends Fragment {
                     connectionProcessor.setEnabled(false);
                     break;
                 }
-                ((MainActivity)getActivity()).sendData("1,"+(-1*standardizeJoystickValue(joystick.getNormalizedX()))
-                        +","+(-1*standardizeJoystickValue(joystick.getNormalizedY())));
+                commClass.packetID = PacketID.MANUAL_CONTROL.ordinal();
+                commClass.data = new double[]{
+                        -1*standardizeJoystickValue(joystick.getNormalizedX()),
+                        -1*standardizeJoystickValue(joystick.getNormalizedY())
+                };
+                ((MainActivity)getActivity()).sendData(commClass);
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

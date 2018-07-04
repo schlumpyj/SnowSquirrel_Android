@@ -32,6 +32,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 // TODO: TCP connection code!
 
 public class MainActivity extends AppCompatActivity
@@ -54,6 +56,8 @@ public class MainActivity extends AppCompatActivity
 
     private ConnectionProcessor connectionProcessor;
 
+    private CommClass commClass;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +78,8 @@ public class MainActivity extends AppCompatActivity
 
         connected_text = (TextView)findViewById(R.id.connected_text);
         connected_layout = (RelativeLayout)findViewById(R.id.connected_layout);
+
+        commClass = new CommClass();
 
         connectionProcessor = new ConnectionProcessor();
 
@@ -186,9 +192,10 @@ public class MainActivity extends AppCompatActivity
 
     public class SendMessage implements Runnable {
         private String message;
-        public SendMessage(String message)
+        public SendMessage(CommClass message)
         {
-            this.message = message;
+            Gson gson = new Gson();
+            this.message = gson.toJson(message);
         }
         public void run()
         {
@@ -205,7 +212,9 @@ public class MainActivity extends AppCompatActivity
                 if (mTcpClient != null)
                 {
                     // send heartbeat message
-                    sendData("heartbeat");
+                    commClass.data = new double[]{0,1,2};
+                    commClass.packetID = PacketID.HEARTBEAT.ordinal();
+                    sendData(commClass);
 
                     // check to see how long it was since the last message
                     if (System.currentTimeMillis() - mTcpClient.getLastUpdateTime() > 1000)
@@ -241,7 +250,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void sendData(String data)
+    public void sendData(CommClass data)
     {
         SendMessage sender = new SendMessage(data);
         (new Thread(sender)).start();
