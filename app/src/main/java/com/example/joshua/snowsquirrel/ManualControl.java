@@ -6,6 +6,7 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,6 +38,8 @@ public class ManualControl extends Fragment {
     private JoystickView joystick;
 
     private boolean isEnabled = false;
+
+    private ConnectionProcessor connectionProcessor;
 
     public ManualControl() {
         // Required empty public constructor
@@ -84,6 +87,8 @@ public class ManualControl extends Fragment {
 
         Intent i = getActivity().getIntent();
 
+        connectionProcessor = (ConnectionProcessor)i.getSerializableExtra("Connection");
+
         joystick = (JoystickView)view.findViewById(R.id.joystick);
 
         enable_disable = (Button)view.findViewById(R.id.enable_manual_control);
@@ -92,6 +97,7 @@ public class ManualControl extends Fragment {
             @Override
             public void onClick(View v) {
                 isEnabled = !isEnabled;
+                connectionProcessor.setEnabled(isEnabled);
                 if (isEnabled)
                 {
                     ConstantUpdater stuff = new ConstantUpdater();
@@ -108,16 +114,37 @@ public class ManualControl extends Fragment {
             }
         });
 
+        connectionProcessor.setOnConnectionListener(
+            new ConnectionListener() {
+                @Override
+                public void onConnected() {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setConnectionState(true);
+                        }
+                    });
+                }
+
+                @Override
+                public void onDisconnected() {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setConnectionState(false);
+                        }
+                    });
+                }
+            }
+        );
+
         MjpegView mv = (MjpegView) view.findViewById(R.id.videwView);
 
-        mv.Start("http://webcam.st-malo.com/axis-cgi/mjpg/video.cgi?resolution=352x288");
+        mv.Start("10.24.67:5800");
+
+        setConnectionState(connectionProcessor.getConnectionState());
 
         return view;
-    }
-
-    public boolean getEnabled()
-    {
-        return isEnabled;
     }
 
     class ConstantUpdater implements Runnable
@@ -129,6 +156,7 @@ public class ManualControl extends Fragment {
                 if (((MainActivity)getActivity())== null)
                 {
                     isEnabled = false;
+                    connectionProcessor.setEnabled(false);
                     break;
                 }
                 ((MainActivity)getActivity()).sendData("1,"+(-1*standardizeJoystickValue(joystick.getNormalizedX()))
@@ -152,24 +180,12 @@ public class ManualControl extends Fragment {
     {
         if (state)
         {
-            if (enable_disable == null)
-            {
-                if (getActivity() != null)
-                    ((MainActivity)getActivity()).setConnected(true);
-                return;
-            }
             enable_disable.setText("Enable");
             enable_disable.setEnabled(true);
             enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorEnable));
         }
         else
         {
-            if (enable_disable == null)
-            {
-                if (getActivity() != null)
-                    ((MainActivity)getActivity()).setConnected(false);
-                return;
-            }
             enable_disable.setText("Not connected");
             enable_disable.setEnabled(false);
             enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorDisable));
@@ -179,12 +195,19 @@ public class ManualControl extends Fragment {
     public void setConnectionState(boolean state)
     {
         if (state)
-            connectionState(true);
+        {
+            if (isVisible())
+                connectionState(true);
+        }
         else
         {
-            Toast.makeText(getContext(), "Lost connection with robot!", Toast.LENGTH_LONG).show();
-            connectionState(false);
-            isEnabled = false;
+            if (isVisible())
+            {
+                Toast.makeText(getContext(), "Lost connection with robot!", Toast.LENGTH_LONG).show();
+                connectionState(false);
+                connectionProcessor.setEnabled(false);
+            }
+
         }
     }
 }

@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity
 
     private String ip, port;
 
+    private ConnectionProcessor connectionProcessor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,12 +73,16 @@ public class MainActivity extends AppCompatActivity
         connected_text = (TextView)findViewById(R.id.connected_text);
         connected_layout = (RelativeLayout)findViewById(R.id.connected_layout);
 
+        connectionProcessor = new ConnectionProcessor();
+
+        getIntent().putExtra("Connection", connectionProcessor);
+
         homeFrag = new HomeFrag();
         manualFrag = new ManualControl();
         settingsFrag = new Settings();
         pathSetter = new PathSetter();
 
-        ip = "10.24.67.20";
+        ip = "10.0.0.126";
         port = "5002";
 
         ConnectTask connectTask = new ConnectTask();
@@ -127,7 +133,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (((ManualControl)manualFrag).getEnabled() && id != R.id.nav_manual_control)
+        if (connectionProcessor.getEnabled() && id != R.id.nav_manual_control)
             Toast.makeText(this, "Manual Control Disabled", Toast.LENGTH_LONG).show();
 
         if (id == R.id.nav_settings) {
@@ -203,14 +209,10 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (isConnected)
                         {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setConnectionGUIState(false);
-                                    ((ManualControl)manualFrag).setConnectionState(false);
-                                }
-                            });
+                            connectionProcessor.setDisconnected();
+                            setConnectionGUIState();
                         }
+
                         isConnected = false;
                     }
 
@@ -218,14 +220,11 @@ public class MainActivity extends AppCompatActivity
                     {
                         Log.d("Connected", isConnected?"Yes":"No");
                         if (!isConnected)
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Log.e("what", "im here boi");
-                                    setConnectionGUIState(true);
-                                    ((ManualControl)manualFrag).setConnectionState(true);
-                                }
-                            });
+                        {
+                            connectionProcessor.setConnected();
+                            setConnectionGUIState();
+                        }
+
                         isConnected = true;
                     }
                 }
@@ -249,20 +248,25 @@ public class MainActivity extends AppCompatActivity
         return isConnected;
     }
 
-    private void setConnectionGUIState(boolean connected)
+    private void setConnectionGUIState()
     {
         if (homeFrag.isVisible())
         {
-            if (connected)
-            {
-                ((RelativeLayout)findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorEnable);
-                ((TextView)findViewById(R.id.connected_text)).setText("Connected!");
-            }
-            else
-            {
-                ((RelativeLayout)findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorAccent);
-                ((TextView)findViewById(R.id.connected_text)).setText("Not Connected!");
-            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (isConnected)
+                    {
+                        ((RelativeLayout)findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorEnable);
+                        ((TextView)findViewById(R.id.connected_text)).setText("Connected!");
+                    }
+                    else
+                    {
+                        ((RelativeLayout)findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorAccent);
+                        ((TextView)findViewById(R.id.connected_text)).setText("Not Connected!");
+                    }
+                }
+            });
         }
 
     }
