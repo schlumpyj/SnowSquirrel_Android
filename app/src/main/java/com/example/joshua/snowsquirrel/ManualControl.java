@@ -1,7 +1,9 @@
 package com.example.joshua.snowsquirrel;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -145,9 +147,13 @@ public class ManualControl extends Fragment {
             }
         );
 
+        SharedPreferences preferences = this.getActivity().getSharedPreferences(((MainActivity)getActivity()).SETTINGS_LOCATION, Context.MODE_PRIVATE);
+        String address = "http://"+(preferences.getString("robot_ip", "10.24.67.20"))+":8080/?action=stream";
+
         MjpegView mv = (MjpegView) view.findViewById(R.id.videwView);
 
-        mv.Start("10.24.67:5800");
+        Log.e("address", address);
+        mv.Start(address);
 
         setConnectionState(connectionProcessor.getConnectionState());
 
@@ -168,7 +174,7 @@ public class ManualControl extends Fragment {
                 }
                 commClass.packetID = PacketID.MANUAL_CONTROL.ordinal();
                 commClass.data = new double[]{
-                        -1*standardizeJoystickValue(joystick.getNormalizedX()),
+                        standardizeJoystickValue(joystick.getNormalizedX()),
                         -1*standardizeJoystickValue(joystick.getNormalizedY())
                 };
                 ((MainActivity)getActivity()).sendData(commClass);
