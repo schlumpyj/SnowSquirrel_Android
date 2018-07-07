@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -59,6 +60,8 @@ public class MainActivity extends AppCompatActivity
     private ConnectionProcessor connectionProcessor;
 
     private CommClass commClass;
+
+    private static MainActivity ins;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +125,8 @@ public class MainActivity extends AppCompatActivity
         selectFrag(homeFrag);
         navigationView.getMenu().getItem(0).setChecked(true);
 
+        ins = this;
+
     }
 
     @Override
@@ -149,8 +154,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_change_wifi) {
+            startActivity(new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK));
         }
 
         return super.onOptionsItemSelected(item);
@@ -177,6 +182,10 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public static MainActivity getInstance() {
+        return ins;
     }
 
     public void selectFrag(Fragment frag) {
@@ -231,7 +240,7 @@ public class MainActivity extends AppCompatActivity
                 if (mTcpClient != null)
                 {
                     // send heartbeat message
-                    commClass.data = new double[]{0,1,2};
+                    commClass.data = new double[]{0};
                     commClass.packetID = PacketID.HEARTBEAT.ordinal();
                     sendData(commClass);
 
@@ -241,10 +250,10 @@ public class MainActivity extends AppCompatActivity
                         if (isConnected)
                         {
                             connectionProcessor.setDisconnected();
+
+                            isConnected = false;
                             setConnectionGUIState();
                         }
-
-                        isConnected = false;
                     }
 
                     else
@@ -253,10 +262,10 @@ public class MainActivity extends AppCompatActivity
                         if (!isConnected)
                         {
                             connectionProcessor.setConnected();
+
+                            isConnected = true;
                             setConnectionGUIState();
                         }
-
-                        isConnected = true;
                     }
                 }
 
@@ -317,9 +326,12 @@ public class MainActivity extends AppCompatActivity
 
         edit.apply();
 
+        changeIP();
+    }
+
+    public void changeIP() {
         ChangeIPTask changer = new ChangeIPTask();
         (new Thread(changer)).start();
-
     }
 
     public class ChangeIPTask implements Runnable {

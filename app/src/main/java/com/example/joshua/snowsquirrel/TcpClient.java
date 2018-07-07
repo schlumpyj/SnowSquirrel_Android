@@ -76,17 +76,19 @@ public class TcpClient{
 
                 //receives the message which the server sends back
                 mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                // send login name
-                sendMessage(Constants.LOGIN_NAME+"Mono");
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
                     mServerMessage = mBufferIn.readLine();
-                    lastUpdate = System.currentTimeMillis();
                     if (mServerMessage != null && mMessageListener != null) {
+                        lastUpdate = System.currentTimeMillis();
                         //call the method messageReceived from MyActivity class
                         mMessageListener.messageReceived(mServerMessage);
                         Log.i("received", mServerMessage);
+                    }
+                    else {
+                        Log.e("failing", "socket failed!!!");
+                        break;
                     }
 
                 }
@@ -127,6 +129,8 @@ public class TcpClient{
                 //Log.i("fail", "failing");
             }
         }
+
+        Log.e("connected??????", socket.isConnected()?"NOW_CONNECTED":"NOW_NOT_CONNECTED");
     }
 
 
