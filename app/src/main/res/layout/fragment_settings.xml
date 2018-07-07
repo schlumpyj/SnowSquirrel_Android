@@ -17,6 +17,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/robot_ip_address"
             android:text="10.24.67.20"
+            android:inputType="number"
+            android:digits="0123456789."
             android:hint="Robot IP Address" />
     </android.support.design.widget.TextInputLayout>
 
@@ -29,6 +31,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/robot_tcp_port"
             android:text="5002"
+            android:inputType="number"
+            android:digits="0123456789"
             android:hint="Robot TCP Port" />
     </android.support.design.widget.TextInputLayout>
 
