@@ -3,7 +3,7 @@
     xmlns:stream="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.joshua.snowsquirrel.ManualControl">
+    tools:context="com.gofirst.joshua.snowsquirrel.ManualControl">
 
     <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -12,7 +12,7 @@
         android:orientation="vertical"
         android:gravity="fill_vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="com.example.joshua.snowsquirrel.MainActivity"
+        tools:context="com.gofirst.joshua.snowsquirrel.MainActivity"
         tools:showIn="@layout/app_bar_main">
 
         <yjkim.mjpegviewer.MjpegView
