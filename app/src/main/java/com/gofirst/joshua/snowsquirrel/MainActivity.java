@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity
         {
             while (true)
             {
-                if (mTcpClient != null)
+                if (mTcpClient != null && mTcpClient.isConnected())
                 {
                     // send heartbeat message
                     commClass.data = new double[]{0};
@@ -329,6 +329,14 @@ public class MainActivity extends AppCompatActivity
     public void changeIP() {
         ChangeIPTask changer = new ChangeIPTask();
         (new Thread(changer)).start();
+    }
+
+    public void endConnection()
+    {
+        if (mTcpClient != null)
+        {
+            mTcpClient.stopClient();
+        }
     }
 
     public class ChangeIPTask implements Runnable {

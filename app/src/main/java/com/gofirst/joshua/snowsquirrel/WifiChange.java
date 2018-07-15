@@ -16,12 +16,21 @@ public class WifiChange extends BroadcastReceiver{
     public void onReceive(Context context, Intent intent) {
 
         NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-        if(info != null && info.isConnected()) {
-            // Do your work.
-            if (MainActivity.LOGS)
-                Log.e("network_change", "NETWORK CONNECTED");
+        if(info != null) {
 
-            MainActivity.getInstance().changeIP();
+            if (info.isConnected())
+            {            // Do your work.
+                if (MainActivity.LOGS)
+                    Log.e("network_change", "NETWORK CONNECTED");
+
+                MainActivity.getInstance().changeIP();
+
+            }
+            else
+            {
+                MainActivity.getInstance().endConnection();
+            }
+
         }
     }
 }

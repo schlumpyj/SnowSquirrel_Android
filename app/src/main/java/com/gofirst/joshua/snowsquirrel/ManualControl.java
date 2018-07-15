@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,7 +146,7 @@ public class ManualControl extends Fragment {
         );
 
         SharedPreferences preferences = this.getActivity().getSharedPreferences(((MainActivity)getActivity()).SETTINGS_LOCATION, Context.MODE_PRIVATE);
-        String address = "http://"+(preferences.getString("robot_ip", "10.24.67.20"))+":8080/?action=stream";
+        String address = "http://"+(preferences.getString("robot_ip", "10.24.67.20"))+":8080/stream?topic=/camera/image_raw&type=ros_compressed";
 
         MjpegView mv = (MjpegView) view.findViewById(R.id.videwView);
 
@@ -175,7 +176,7 @@ public class ManualControl extends Fragment {
                 };
                 ((MainActivity)getActivity()).sendData(commClass);
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

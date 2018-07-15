@@ -24,6 +24,7 @@ public class TcpClient{
     private Socket socket;
 
     private long lastUpdate;
+    private long lastTime;
 
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
@@ -39,8 +40,13 @@ public class TcpClient{
      */
     public void sendMessage(String message) {
         if (mBufferOut != null && !mBufferOut.checkError()) {
-            mBufferOut.println(message);
+            Log.i("Time", "Current: "+(System.currentTimeMillis() - lastTime));
+            lastTime = System.currentTimeMillis();
+
+            mBufferOut.write(message+'\n');
             mBufferOut.flush();
+
+            lastTime = System.currentTimeMillis();
         }
     }
 
@@ -60,6 +66,14 @@ public class TcpClient{
         mBufferIn = null;
         mBufferOut = null;
         mServerMessage = null;
+
+        try {
+            Log.e("socket closed", "SOCKET FORCEFULLY CLOSED ++++++++++++++++++++++++++");
+            socket.close();
+        }
+        catch (IOException e) {
+            Log.e("error", e.toString());
+        }
     }
 
     public void run() {
@@ -72,7 +86,8 @@ public class TcpClient{
 
             try {
                 //sends the message to the server
-                mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                //mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                mBufferOut = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 
                 //receives the message which the server sends back
                 mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -122,6 +137,7 @@ public class TcpClient{
                 socket = new Socket();
                 InetSocketAddress sa = new InetSocketAddress(serverAddr, server_port);
                 socket.connect(sa, 500);
+                socket.setTcpNoDelay(true);
             } catch (IOException e) { }
         }
     }
@@ -143,4 +159,12 @@ public class TcpClient{
         server_ip = ip;
         server_port = port;
     }
+
+    public boolean isConnected() {
+        if (socket != null)
+            return socket.isConnected();
+        else
+            return false;
+    }
+
 }
