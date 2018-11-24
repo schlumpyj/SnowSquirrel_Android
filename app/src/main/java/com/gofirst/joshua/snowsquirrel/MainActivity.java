@@ -29,14 +29,13 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-// TODO: TCP connection code!
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Settings.OnFragmentInteractionListener {
 
     private Fragment homeFrag, manualFrag, pathSetter, settingsFrag;
 
-    public String SETTINGS_LOCATION = "robot_settings";
+    public static String SETTINGS_LOCATION = "robot_settings";
+    public static String PATH_LOCATION = "paths";
 
     private TcpClient mTcpClient;
     private boolean isConnected = false;

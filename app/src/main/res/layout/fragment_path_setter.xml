@@ -12,50 +12,110 @@
 
         <com.jjoe64.graphview.GraphView
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="0dp"
+            android:layout_weight=".5"
             android:id="@+id/graphBuilder"
             app:seriesColor="#ee0000" />
 
-        <TextView
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enter in a new coordinate" />
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp">
 
-        <LinearLayout
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:textSize="20sp"
+                android:layout_centerVertical="true"
+                android:text="Choose Path To Edit:"/>
+
+            <Spinner
+                android:id="@+id/path_edit_chooser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="fill">
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
 
-            <EditText
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight=".33"
-                android:id="@+id/x_coord"
-                android:inputType = "number"
-                android:hint="X"/>
-
-            <EditText
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight=".33"
-                android:id="@+id/y_coord"
-                android:inputType = "number"
-                android:hint="Y"/>
-
-            <Button
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Add Coordinate"
-                android:layout_weight=".33"
-                android:id="@+id/add_button"/>
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_centerVertical="true"
+                android:text="Path Name:"/>
 
-        </LinearLayout>
+            <EditText
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:id="@+id/path_name"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_centerVertical="true"
+                android:text="Path Width (Meters):"/>
+
+            <EditText
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:id="@+id/width_coord"
+                android:inputType = "number"
+                android:digits="0123456789."
+                android:hint="Width"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_centerVertical="true"
+                android:text="Path Length (Meters):"/>
+
+            <EditText
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:id="@+id/length_coord"
+                android:inputType = "number"
+                android:digits="0123456789."
+                android:hint="Length"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="15dp"
             android:text="Save Path"
             android:id="@+id/save_button"/>
 

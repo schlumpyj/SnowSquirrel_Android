@@ -2,19 +2,29 @@ package com.gofirst.joshua.snowsquirrel;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
+import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.PointsGraphSeries;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -33,26 +43,17 @@ public class PathSetter extends Fragment {
     private String mParam2;
 
     private GraphView graph;
+    private Spinner path_selector;
 
-    private EditText x_coord, y_coord;
+    private EditText width_coord, length_coord, name;
 
-    private Button add, save;
-
-    private double maxX, maxY;
+    private Button save;
+    private PathStorage paths;
 
     public PathSetter() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PathSetter.
-     */
-    // TODO: Rename and change types and number of parameters
     public static PathSetter newInstance(String param1, String param2) {
         PathSetter fragment = new PathSetter();
         Bundle args = new Bundle();
@@ -78,64 +79,117 @@ public class PathSetter extends Fragment {
         View view = inflater.inflate(R.layout.fragment_path_setter, container, false);
 
         graph = (GraphView)view.findViewById(R.id.graphBuilder);
+        path_selector = (Spinner)view.findViewById(R.id.path_edit_chooser);
 
-        LineGraphSeries<DataPoint> series2 = new LineGraphSeries<>(new DataPoint[] {
-            new DataPoint(0,0)
-        });
-        graph.addSeries(series2);
+        List<String> spinnerArray =  new ArrayList<String>();
+        spinnerArray.add("Test I");
+        spinnerArray.add("Test II");
 
-        SharedPreferences settings = getContext().getSharedPreferences("snowsquirrelPaths", 0);
-        SharedPreferences.Editor editor = settings.edit();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this.getContext(), R.layout.spinner, spinnerArray);
 
-        x_coord = (EditText)view.findViewById(R.id.x_coord);
-        y_coord = (EditText)view.findViewById(R.id.y_coord);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        add = (Button)view.findViewById(R.id.add_button);
+        path_selector.setAdapter(adapter);
+
+        width_coord = (EditText)view.findViewById(R.id.width_coord);
+        length_coord = (EditText)view.findViewById(R.id.length_coord);
+        name = (EditText)view.findViewById(R.id.path_name);
+
         save = (Button)view.findViewById(R.id.save_button);
-
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                double x = Double.parseDouble(x_coord.getText().toString());
-                double y = Double.parseDouble(y_coord.getText().toString());
-
-                if (x>maxX) maxX = x;
-                if (y>maxY) maxY = y;
-                series2.appendData(new DataPoint(x, y),
-                        false, 100);
-
-                graph.getViewport().setMinX(maxX);
-                graph.getViewport().setMinY(maxY);
-
-                graph.addSeries(series2);
-            }
-        });
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Alert with the ability to set name of path
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                double width = Double.parseDouble(width_coord.getText().toString());
+                double length = Double.parseDouble(length_coord.getText().toString());
 
-                final EditText editText = new EditText(getContext());
-                builder.setMessage("Enter in a name for this Path");
-                builder.setTitle("Name the Path");
+                double[] newData = new double[] {width, length};
+                int index = path_selector.getSelectedItemPosition();
+                paths.DimensionArray[index] = newData;
+                paths.Names[index] = name.getText().toString();
 
-                builder.setView(editText);
+                showGraph(index);
 
-                builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // TODO: need to figure out how to save all the arrays
-                    }
-                });
+                SharedPreferences settings = getContext().getSharedPreferences(MainActivity.SETTINGS_LOCATION, Context.MODE_PRIVATE);
+                SharedPreferences.Editor edit= settings.edit();
 
-                builder.show();
+                edit.putString(MainActivity.PATH_LOCATION, new Gson().toJson(paths));
+                edit.apply();
             }
         });
+
+        path_selector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                showGraph(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+
+        });
+
+
+        SharedPreferences settings = getContext().getSharedPreferences(MainActivity.SETTINGS_LOCATION, Context.MODE_PRIVATE);
+        String pathsString = settings.getString(MainActivity.PATH_LOCATION, "-1");
+        if (pathsString.equals("-1"))
+        {
+            paths = new PathStorage();
+        }
+        else
+        {
+            Gson gson = new Gson();
+            paths = gson.fromJson(pathsString, PathStorage.class);
+        }
+
+        showGraph(0);
 
         return view;
     }
 
+    private void showGraph(int index)
+    {
+        graph.removeAllSeries();
+
+        double width = paths.DimensionArray[index][0];
+        double length = paths.DimensionArray[index][1];
+        String nameFromStorage = paths.Names[index];
+
+        if (nameFromStorage != null)
+            name.setText(nameFromStorage);
+        else
+            name.setText("");
+
+        width_coord.setText(Double.toString(width));
+        length_coord.setText(Double.toString(length));
+
+        LineGraphSeries<DataPoint> newSeries = new LineGraphSeries<>(
+                new DataPoint[]{
+                        new DataPoint(0,0),
+                        new DataPoint(0, length),
+                        new DataPoint(width,length),
+                        new DataPoint(width,0)
+                });
+
+        double max;
+        if (width > length)
+            max = width;
+        else
+            max = length;
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(max);
+
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(max);
+
+        newSeries.setDrawBackground(true);
+
+        graph.addSeries(newSeries);
+    }
 
 }

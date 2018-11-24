@@ -28,6 +28,7 @@ public class WifiChange extends BroadcastReceiver{
             }
             else
             {
+                Log.e("network_change", "NETWORK NOT CONNECTED");
                 MainActivity.getInstance().endConnection();
             }
 

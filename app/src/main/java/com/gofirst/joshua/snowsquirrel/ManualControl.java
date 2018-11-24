@@ -171,7 +171,7 @@ public class ManualControl extends Fragment {
                 }
                 commClass.packetID = PacketID.MANUAL_CONTROL.ordinal();
                 commClass.data = new double[]{
-                        standardizeJoystickValue(joystick.getNormalizedX()),
+                        -1*standardizeJoystickValue(joystick.getNormalizedX()),
                         -1*standardizeJoystickValue(joystick.getNormalizedY())
                 };
                 ((MainActivity)getActivity()).sendData(commClass);
