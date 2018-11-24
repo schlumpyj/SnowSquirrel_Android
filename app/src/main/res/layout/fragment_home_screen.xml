@@ -55,13 +55,12 @@
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_marginTop="30dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginLeft="16dp"
             android:id="@+id/canvas_test">
 
             <com.jjoe64.graphview.GraphView
+                android:layout_above="@+id/start_path"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="match_parent"
                 android:id="@+id/graph"
                 app:seriesColor="#ee0000" />
 
@@ -70,8 +69,10 @@
                 android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="10dp"
                 android:paddingBottom="16dp"
                 android:paddingTop="16dp"
                 android:text="Start Path"

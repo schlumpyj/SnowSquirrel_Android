@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.PointsGraphSeries;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -49,6 +52,9 @@ public class PathSetter extends Fragment {
 
     private Button save;
     private PathStorage paths;
+
+    private List<String> spinnerOptions;
+    private ArrayAdapter<String> adapter;
 
     public PathSetter() {
         // Required empty public constructor
@@ -81,12 +87,11 @@ public class PathSetter extends Fragment {
         graph = (GraphView)view.findViewById(R.id.graphBuilder);
         path_selector = (Spinner)view.findViewById(R.id.path_edit_chooser);
 
-        List<String> spinnerArray =  new ArrayList<String>();
-        spinnerArray.add("Test I");
-        spinnerArray.add("Test II");
+        spinnerOptions =  new ArrayList<String>();
+        spinnerOptions.add("");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this.getContext(), R.layout.spinner, spinnerArray);
+        adapter = new ArrayAdapter<String>(
+                this.getContext(), R.layout.spinner, spinnerOptions);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -151,6 +156,8 @@ public class PathSetter extends Fragment {
 
     private void showGraph(int index)
     {
+        updateSpinner();
+
         graph.removeAllSeries();
 
         double width = paths.DimensionArray[index][0];
@@ -191,5 +198,20 @@ public class PathSetter extends Fragment {
 
         graph.addSeries(newSeries);
     }
+
+    private void updateSpinner()
+    {
+        spinnerOptions.clear();
+        for (int index = 0; index<10;index++)
+        {
+            if (paths.Names[index] == null)
+                spinnerOptions.add((index+1)+")");
+            else
+                spinnerOptions.add((index+1)+") "+paths.Names[index]);
+        }
+
+        adapter.notifyDataSetChanged();
+    }
+
 
 }

@@ -19,17 +19,22 @@ public class WifiChange extends BroadcastReceiver{
         if(info != null) {
 
             if (info.isConnected())
-            {            // Do your work.
+            {
                 if (MainActivity.LOGS)
-                    Log.e("network_change", "NETWORK CONNECTED");
+                    Log.i("network_change", "NETWORK CONNECTED");
 
-                MainActivity.getInstance().changeIP();
+                MainActivity instance = MainActivity.getInstance();
+                if (instance != null)
+                    MainActivity.getInstance().changeIP();
 
             }
             else
             {
-                Log.e("network_change", "NETWORK NOT CONNECTED");
-                MainActivity.getInstance().endConnection();
+                if (MainActivity.LOGS)
+                    Log.i("network_change", "NETWORK NOT CONNECTED");
+                MainActivity instance = MainActivity.getInstance();
+                if (instance != null)
+                    MainActivity.getInstance().endConnection();
             }
 
         }

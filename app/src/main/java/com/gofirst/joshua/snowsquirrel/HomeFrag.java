@@ -1,7 +1,9 @@
 package com.gofirst.joshua.snowsquirrel;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -47,6 +50,10 @@ public class HomeFrag extends Fragment {
     private ConnectionProcessor connectionProcessor;
 
     private LineGraphSeries<DataPoint> series;
+
+    private PathStorage paths;
+    private ArrayAdapter<String> adapter;
+    List<String> spinnerOptions;
 
     public HomeFrag() {
         // Required empty public constructor
@@ -104,12 +111,11 @@ public class HomeFrag extends Fragment {
 
         connectionProcessor = (ConnectionProcessor)i.getSerializableExtra("Connection");
 
-        List<String> spinnerArray =  new ArrayList<String>();
-        spinnerArray.add("Triple I");
-        spinnerArray.add("Single I");
+        spinnerOptions =  new ArrayList<String>();
+        spinnerOptions.add("");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this.getContext(), R.layout.spinner, spinnerArray);
+        adapter = new ArrayAdapter<String>(
+                this.getContext(), R.layout.spinner, spinnerOptions);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner sItems = (Spinner) view.findViewById(R.id.path_chooser);
@@ -118,48 +124,90 @@ public class HomeFrag extends Fragment {
         sItems.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                // your code here
-                graph.removeAllSeries();
-                if (position == 1) {
-                    series = new LineGraphSeries<>(new DataPoint[] {
-                            new DataPoint(0, 0),
-                            new DataPoint(0, 10),
-                            new DataPoint(3, 10),
-                            new DataPoint(3, 0),
-                            new DataPoint(3.1,0)
-                    });
-                }
-                else {
-                    series = new LineGraphSeries<>(new DataPoint[] {
-                            new DataPoint(0, 0),
-                            new DataPoint(0, 10),
-                            new DataPoint(10, 10),
-                            new DataPoint(10, 0),
-                            new DataPoint(11,0)
-                    });
-                }
-
-                series.setDrawBackground(true);
-
-                graph.getViewport().setXAxisBoundsManual(true);
-                graph.getViewport().setMinX(0);
-                graph.getViewport().setMaxX(10);
-
-                graph.getViewport().setYAxisBoundsManual(true);
-                graph.getViewport().setMinY(0);
-                graph.getViewport().setMaxY(10);
-
-                graph.addSeries(series);
+                showGraph(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
+
             }
 
         });
 
+        updateSpinner();
+        showGraph(0);
+
         return view;
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden)
+    {
+        super.onHiddenChanged(hidden);
+
+        if (!hidden)
+            updateSpinner();
+    }
+
+
+    private void showGraph(int index)
+    {
+        graph.removeAllSeries();
+
+        double width = paths.DimensionArray[index][0];
+        double length = paths.DimensionArray[index][1];
+
+        LineGraphSeries<DataPoint> newSeries = new LineGraphSeries<>(
+                new DataPoint[]{
+                        new DataPoint(0,0),
+                        new DataPoint(0, length),
+                        new DataPoint(width,length),
+                        new DataPoint(width,0)
+                });
+
+        double max;
+        if (width > length)
+            max = width;
+        else
+            max = length;
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(max);
+
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(max);
+
+        newSeries.setDrawBackground(true);
+
+        graph.addSeries(newSeries);
+    }
+
+    private void updateSpinner()
+    {
+        SharedPreferences settings = getContext().getSharedPreferences(MainActivity.SETTINGS_LOCATION, Context.MODE_PRIVATE);
+        String pathsString = settings.getString(MainActivity.PATH_LOCATION, "-1");
+        if (pathsString.equals("-1"))
+        {
+            paths = new PathStorage();
+        }
+        else
+        {
+            Gson gson = new Gson();
+            paths = gson.fromJson(pathsString, PathStorage.class);
+        }
+
+        spinnerOptions.clear();
+        for (int index = 0; index<10;index++)
+        {
+            if (paths.Names[index] == null)
+                spinnerOptions.add((index+1)+")");
+            else
+                spinnerOptions.add((index+1)+") "+paths.Names[index]);
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     public void setConnectionGUIState(boolean connected)
