@@ -76,10 +76,10 @@ public class Settings extends Fragment {
         port = (TextInputEditText)view.findViewById(R.id.robot_tcp_port);
         password = (TextInputEditText)view.findViewById(R.id.robot_password);
 
-        SharedPreferences preferences = this.getActivity().getSharedPreferences(((MainActivity)getActivity()).SETTINGS_LOCATION, Context.MODE_PRIVATE);
+        SharedPreferences preferences = this.getActivity().getSharedPreferences(Constants.SETTINGS_LOCATION, Context.MODE_PRIVATE);
 
-        ip_address.setText(preferences.getString("robot_ip", ""));
-        port.setText(preferences.getString("robot_tcp_port", ""));
+        ip_address.setText(preferences.getString("robot_ip", Constants.DEFAULT_IP));
+        port.setText(preferences.getString("robot_tcp_port", Constants.DEFAULT_PORT));
         password.setText(preferences.getString("robot_password", ""));
 
         saveButton = (Button)view.findViewById(R.id.save_settings);
@@ -94,7 +94,6 @@ public class Settings extends Fragment {
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

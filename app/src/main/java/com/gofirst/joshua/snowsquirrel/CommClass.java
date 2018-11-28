@@ -6,5 +6,6 @@ package com.gofirst.joshua.snowsquirrel;
 
 public class CommClass {
     public int packetID;
+    public int status;
     public double[] data;
 }

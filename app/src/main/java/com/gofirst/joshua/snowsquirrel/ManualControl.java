@@ -7,12 +7,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.gofirst.joshua.snowsquirrel.Enums.PacketID;
 
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 import yjkim.mjpegviewer.MjpegView;
@@ -46,15 +47,6 @@ public class ManualControl extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ManualControl.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ManualControl newInstance(String param1, String param2) {
         ManualControl fragment = new ManualControl();
         Bundle args = new Bundle();
@@ -99,19 +91,26 @@ public class ManualControl extends Fragment {
         enable_disable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isEnabled = !isEnabled;
-                connectionProcessor.setEnabled(isEnabled);
-                if (isEnabled)
+                if (connectionProcessor.isPathEnabled())
                 {
-                    ConstantUpdater stuff = new ConstantUpdater();
-                    (new Thread(stuff)).start();
-                    enable_disable.setText("Disable");
-                    enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorDisable));
+                    Toast.makeText(getContext(), "Unable to control robot while completing autonomous path", Toast.LENGTH_LONG).show();
                 }
                 else
                 {
-                    enable_disable.setText("Enable");
-                    enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorEnable));
+                    isEnabled = !isEnabled;
+                    connectionProcessor.setManualEnabled(isEnabled);
+                    if (isEnabled)
+                    {
+                        ConstantUpdater stuff = new ConstantUpdater();
+                        (new Thread(stuff)).start();
+                        enable_disable.setText("Disable");
+                        enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorDisable));
+                    }
+                    else
+                    {
+                        enable_disable.setText("Enable");
+                        enable_disable.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorEnable));
+                    }
                 }
 
             }
@@ -145,8 +144,8 @@ public class ManualControl extends Fragment {
             }
         );
 
-        SharedPreferences preferences = this.getActivity().getSharedPreferences(((MainActivity)getActivity()).SETTINGS_LOCATION, Context.MODE_PRIVATE);
-        String address = "http://"+(preferences.getString("robot_ip", "10.24.67.20"))+":8080/stream?topic=/camera/image_raw&type=ros_compressed";
+        SharedPreferences preferences = this.getActivity().getSharedPreferences(Constants.SETTINGS_LOCATION, Context.MODE_PRIVATE);
+        String address = "http://"+(preferences.getString("robot_ip", Constants.DEFAULT_IP))+":8080/stream?topic=/camera/image_raw&type=ros_compressed";
 
         MjpegView mv = (MjpegView) view.findViewById(R.id.videwView);
 
@@ -166,7 +165,7 @@ public class ManualControl extends Fragment {
                 if (((MainActivity)getActivity())== null)
                 {
                     isEnabled = false;
-                    connectionProcessor.setEnabled(false);
+                    connectionProcessor.setManualEnabled(false);
                     break;
                 }
                 commClass.packetID = PacketID.MANUAL_CONTROL.ordinal();
@@ -219,7 +218,7 @@ public class ManualControl extends Fragment {
             {
                 Toast.makeText(getContext(), "Lost connection with robot!", Toast.LENGTH_LONG).show();
                 connectionState(false);
-                connectionProcessor.setEnabled(false);
+                connectionProcessor.setManualEnabled(false);
             }
 
         }

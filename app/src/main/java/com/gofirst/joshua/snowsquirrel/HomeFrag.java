@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.gofirst.joshua.snowsquirrel.Enums.PacketID;
 import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -37,7 +38,6 @@ public class HomeFrag extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -51,23 +51,20 @@ public class HomeFrag extends Fragment {
 
     private LineGraphSeries<DataPoint> series;
 
+    private RelativeLayout connectionLabelLayout;
+    private TextView connectionLabel;
+
     private PathStorage paths;
     private ArrayAdapter<String> adapter;
+    private Spinner path_spinner;
     List<String> spinnerOptions;
+
+    private boolean is_auto_path_running;
 
     public HomeFrag() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFrag.
-     */
-    // TODO: Rename and change types and number of parameters
     public static HomeFrag newInstance(String param1, String param2) {
         HomeFrag fragment = new HomeFrag();
         Bundle args = new Bundle();
@@ -90,8 +87,6 @@ public class HomeFrag extends Fragment {
     public void onResume() {
 
         super.onResume();
-
-        setConnectionGUIState(connectionProcessor.getConnectionState());
     }
 
     @Override
@@ -103,9 +98,8 @@ public class HomeFrag extends Fragment {
         graph = (GraphView)view.findViewById(R.id.graph);
 
         startPath = (Button)view.findViewById(R.id.start_path);
-        startPath.setText("START PATH");
-        startPath.setEnabled(true);
-        startPath.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorEnable));
+        connectionLabelLayout = (RelativeLayout)view.findViewById(R.id.connected_layout);
+        connectionLabel = (TextView)view.findViewById(R.id.connected_text);
 
         Intent i = getActivity().getIntent();
 
@@ -118,10 +112,10 @@ public class HomeFrag extends Fragment {
                 this.getContext(), R.layout.spinner, spinnerOptions);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner sItems = (Spinner) view.findViewById(R.id.path_chooser);
-        sItems.setAdapter(adapter);
+        path_spinner = (Spinner) view.findViewById(R.id.path_chooser);
+        path_spinner.setAdapter(adapter);
 
-        sItems.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        path_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 showGraph(position);
@@ -133,6 +127,54 @@ public class HomeFrag extends Fragment {
             }
 
         });
+
+        connectionProcessor = (ConnectionProcessor)i.getSerializableExtra("Connection");
+        connectionProcessor.setOnConnectionListener(
+            new ConnectionListener() {
+                @Override
+                public void onConnected() {
+                    if (isVisible()) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setConnectionGUIState(true);
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onDisconnected() {
+                    if (isVisible()) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setConnectionGUIState(false);
+                            }
+                        });
+                    }
+                }
+            }
+        );
+
+        setConnectionGUIState(connectionProcessor.getConnectionState());
+
+        startPath.setOnClickListener(
+            view -> {
+                is_auto_path_running = !is_auto_path_running;
+
+                int selected = path_spinner.getSelectedItemPosition();
+
+                CommClass commClass = new CommClass();
+                commClass.packetID = PacketID.PATH_CONTROL.ordinal();
+                commClass.status = is_auto_path_running ? 1 : 0;
+                commClass.data = new double[] { paths.DimensionArray[selected][0], paths.DimensionArray[selected][1] };
+
+                ((MainActivity)getActivity()).sendData(commClass);
+
+                setPathButtonState(is_auto_path_running);
+            }
+        );
 
         updateSpinner();
         showGraph(0);
@@ -186,8 +228,8 @@ public class HomeFrag extends Fragment {
 
     private void updateSpinner()
     {
-        SharedPreferences settings = getContext().getSharedPreferences(MainActivity.SETTINGS_LOCATION, Context.MODE_PRIVATE);
-        String pathsString = settings.getString(MainActivity.PATH_LOCATION, "-1");
+        SharedPreferences settings = getContext().getSharedPreferences(Constants.SETTINGS_LOCATION, Context.MODE_PRIVATE);
+        String pathsString = settings.getString(Constants.PATH_LOCATION, "-1");
         if (pathsString.equals("-1"))
         {
             paths = new PathStorage();
@@ -212,15 +254,42 @@ public class HomeFrag extends Fragment {
 
     public void setConnectionGUIState(boolean connected)
     {
+        startPath.setEnabled(connected);
+
         if (connected)
         {
-            ((RelativeLayout)view.findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorEnable);
-            ((TextView)view.findViewById(R.id.connected_text)).setText("Connected!");
+            connectionLabelLayout.setBackgroundResource(R.color.colorEnable);
+            connectionLabel.setText(R.string.connected_text);
+
+            setPathButtonState(connectionProcessor.isPathEnabled());
+
         }
         else
         {
-            ((RelativeLayout)view.findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorAccent);
-            ((TextView)view.findViewById(R.id.connected_text)).setText("Not Connected!");
+            startPath.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorDisable));
+            startPath.setText(R.string.path_not_connected_text);
+            connectionLabelLayout.setBackgroundResource(R.color.colorDisable);
+            connectionLabel.setText(R.string.disconnected_text);
+            path_spinner.setEnabled(true);
+            connectionProcessor.setPathEnabled(false);
+        }
+    }
+
+    private void setPathButtonState(boolean state)
+    {
+        connectionProcessor.setPathEnabled(state);
+
+        if (state)
+        {
+            startPath.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorDisable));
+            startPath.setText(R.string.stop_path_text);
+            path_spinner.setEnabled(false);
+        }
+        else
+        {
+            startPath.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.colorEnable));
+            startPath.setText(R.string.start_path_text);
+            path_spinner.setEnabled(true);
         }
     }
 

@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.gofirst.joshua.snowsquirrel.R;
 import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -116,10 +117,10 @@ public class PathSetter extends Fragment {
 
                 showGraph(index);
 
-                SharedPreferences settings = getContext().getSharedPreferences(MainActivity.SETTINGS_LOCATION, Context.MODE_PRIVATE);
+                SharedPreferences settings = getContext().getSharedPreferences(Constants.SETTINGS_LOCATION, Context.MODE_PRIVATE);
                 SharedPreferences.Editor edit= settings.edit();
 
-                edit.putString(MainActivity.PATH_LOCATION, new Gson().toJson(paths));
+                edit.putString(Constants.PATH_LOCATION, new Gson().toJson(paths));
                 edit.apply();
             }
         });
@@ -137,8 +138,8 @@ public class PathSetter extends Fragment {
         });
 
 
-        SharedPreferences settings = getContext().getSharedPreferences(MainActivity.SETTINGS_LOCATION, Context.MODE_PRIVATE);
-        String pathsString = settings.getString(MainActivity.PATH_LOCATION, "-1");
+        SharedPreferences settings = getContext().getSharedPreferences(Constants.SETTINGS_LOCATION, Context.MODE_PRIVATE);
+        String pathsString = settings.getString(Constants.PATH_LOCATION, "-1");
         if (pathsString.equals("-1"))
         {
             paths = new PathStorage();

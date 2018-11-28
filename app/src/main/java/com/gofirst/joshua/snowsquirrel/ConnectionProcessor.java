@@ -12,7 +12,7 @@ public class ConnectionProcessor implements Serializable
     ArrayList<ConnectionListener> listeners = new ArrayList<ConnectionListener>();
 
     private boolean state = false;
-    private boolean isEnabled = false;
+    private boolean isManualEnabled, isPathEnabled;
 
     public void setOnConnectionListener(ConnectionListener listener)
     {
@@ -44,13 +44,23 @@ public class ConnectionProcessor implements Serializable
         return state;
     }
 
-    public void setEnabled(boolean isEnabled)
+    public void setManualEnabled(boolean isEnabled)
     {
-        this.isEnabled = isEnabled;
+        this.isManualEnabled = isEnabled;
     }
 
-    public boolean getEnabled()
+    public boolean isManualEnabled()
     {
-        return isEnabled;
+        return isManualEnabled;
+    }
+
+    public void setPathEnabled(boolean isEnabled)
+    {
+        this.isPathEnabled = isEnabled;
+    }
+
+    public boolean isPathEnabled()
+    {
+        return isPathEnabled;
     }
 }

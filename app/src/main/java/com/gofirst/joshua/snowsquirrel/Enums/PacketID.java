@@ -1,4 +1,4 @@
-package com.gofirst.joshua.snowsquirrel;
+package com.gofirst.joshua.snowsquirrel.Enums;
 
 /**
  * Created by server on 7/4/18.

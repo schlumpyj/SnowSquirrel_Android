@@ -27,15 +27,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gofirst.joshua.snowsquirrel.Enums.PacketID;
 import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Settings.OnFragmentInteractionListener {
 
     private Fragment homeFrag, manualFrag, pathSetter, settingsFrag;
-
-    public static String SETTINGS_LOCATION = "robot_settings";
-    public static String PATH_LOCATION = "paths";
 
     private TcpClient mTcpClient;
     private boolean isConnected = false;
@@ -105,9 +103,9 @@ public class MainActivity extends AppCompatActivity
         settingsFrag = new Settings();
         pathSetter = new PathSetter();
 
-        SharedPreferences preferences = getSharedPreferences(SETTINGS_LOCATION, Context.MODE_PRIVATE);
-        ip = preferences.getString("robot_ip", "10.24.67.20");
-        port = preferences.getString("robot_tcp_port", "5002");
+        SharedPreferences preferences = getSharedPreferences(Constants.SETTINGS_LOCATION, Context.MODE_PRIVATE);
+        ip = preferences.getString("robot_ip", Constants.DEFAULT_IP);
+        port = preferences.getString("robot_tcp_port", Constants.DEFAULT_PORT);
 
         ConnectTask connectTask = new ConnectTask();
         (new Thread(connectTask)).start();
@@ -159,7 +157,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (connectionProcessor.getEnabled() && id != R.id.nav_manual_control)
+        if (connectionProcessor.isManualEnabled() && id != R.id.nav_manual_control)
             Toast.makeText(this, "Manual Control Disabled", Toast.LENGTH_LONG).show();
 
         if (id == R.id.nav_settings) {
@@ -246,7 +244,6 @@ public class MainActivity extends AppCompatActivity
                             connectionProcessor.setDisconnected();
 
                             isConnected = false;
-                            setConnectionGUIState();
                         }
                     }
 
@@ -260,7 +257,6 @@ public class MainActivity extends AppCompatActivity
                             connectionProcessor.setConnected();
 
                             isConnected = true;
-                            setConnectionGUIState();
                         }
                     }
                 }
@@ -280,29 +276,6 @@ public class MainActivity extends AppCompatActivity
         (new Thread(sender)).start();
     }
 
-    private void setConnectionGUIState()
-    {
-        if (homeFrag.isVisible())
-        {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (isConnected)
-                    {
-                        ((RelativeLayout)findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorEnable);
-                        ((TextView)findViewById(R.id.connected_text)).setText("Connected!");
-                    }
-                    else
-                    {
-                        ((RelativeLayout)findViewById(R.id.connected_layout)).setBackgroundResource(R.color.colorAccent);
-                        ((TextView)findViewById(R.id.connected_text)).setText("Not Connected!");
-                    }
-                }
-            });
-        }
-
-    }
-
     public void setConnected(boolean state)
     {
         isConnected = state;
@@ -310,7 +283,7 @@ public class MainActivity extends AppCompatActivity
 
     public void saveSettings()
     {
-        SharedPreferences preferences = getSharedPreferences(SETTINGS_LOCATION, MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(Constants.SETTINGS_LOCATION, MODE_PRIVATE);
         SharedPreferences.Editor edit= preferences.edit();
 
         ip = ((TextInputEditText)findViewById(R.id.robot_ip_address)).getText().toString();
