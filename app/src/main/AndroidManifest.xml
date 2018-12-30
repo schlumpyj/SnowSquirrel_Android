@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.gofirst.joshua.snowsquirrel">
+    package="com.gofirst.ion.snowsquirrel">
 
     <!-- To access Google+ APIs: -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -11,11 +11,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.gofirst.joshua.snowsquirrel.MainActivity"
+            android:name="com.gofirst.ion.snowsquirrel.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.gofirst.joshua.snowsquirrel.WifiChange" >
+        <receiver android:name="com.gofirst.ion.snowsquirrel.WifiChange" >
             <intent-filter android:priority="100">
                 <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>

@@ -6,7 +6,7 @@
     android:layout_marginLeft="15dp"
     android:layout_marginTop="15dp"
     android:orientation="vertical"
-    tools:context="com.gofirst.joshua.snowsquirrel.Settings">
+    tools:context="com.gofirst.ion.snowsquirrel.Settings">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
