@@ -137,6 +137,56 @@ public class PathSetter extends Fragment {
 
         });
 
+        width_coord.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                try
+                {
+                    Double.parseDouble(width_coord.getText().toString());
+                    save.setEnabled(true);
+                }
+                catch (NumberFormatException e)
+                {
+                    save.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        length_coord.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                try
+                {
+                    Double.parseDouble(length_coord.getText().toString());
+                    save.setEnabled(true);
+                }
+                catch (NumberFormatException e)
+                {
+                    save.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
 
         SharedPreferences settings = getContext().getSharedPreferences(Constants.SETTINGS_LOCATION, Context.MODE_PRIVATE);
         String pathsString = settings.getString(Constants.PATH_LOCATION, "-1");

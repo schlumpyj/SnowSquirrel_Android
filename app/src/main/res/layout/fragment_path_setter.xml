@@ -57,6 +57,9 @@
             <EditText
                 android:layout_width="100dp"
                 android:layout_height="50dp"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:maxLines="1"
                 android:id="@+id/path_name"
                 android:layout_centerVertical="true"
                 android:layout_alignParentEnd="true"/>
@@ -81,6 +84,7 @@
                 android:layout_height="50dp"
                 android:id="@+id/width_coord"
                 android:inputType = "number"
+                android:imeOptions="actionDone"
                 android:digits="0123456789."
                 android:hint="Width"
                 android:layout_centerVertical="true"
@@ -106,6 +110,7 @@
                 android:layout_height="50dp"
                 android:id="@+id/length_coord"
                 android:inputType = "number"
+                android:imeOptions="actionDone"
                 android:digits="0123456789."
                 android:hint="Length"
                 android:layout_centerVertical="true"
